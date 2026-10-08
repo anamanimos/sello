@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Halaman Tidak Ditemukan — Sello</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <style>
+      .error-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gray-50);
+      }
+      .error-content {
+        text-align: center;
+        padding: 40px;
+      }
+      .error-code {
+        font-size: 120px;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin-bottom: 16px;
+      }
+      .error-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 12px;
+      }
+      .error-message {
+        font-size: 16px;
+        color: var(--gray-500);
+        margin-bottom: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-page">
+      <div class="error-content">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Halaman Tidak Ditemukan</h1>
+        <p class="error-message">{{.message}}</p>
+        <a href="/" class="btn btn-primary">Kembali ke Beranda</a>
+      </div>
+    </div>
+  </body>
+</html>

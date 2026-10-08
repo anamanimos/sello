@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - Sello Console</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 24px;
+      }
+      .tab {
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+      }
+      .tab:hover {
+        color: var(--text-primary);
+      }
+      .tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Form */
+      .settings-section {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .form-group {
+        margin-bottom: 12px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+        background: var(--bg-secondary);
+        transition: border-color 0.2s;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .form-group small {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--accent-hover);
+      }
+      .btn-secondary {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+      .btn-secondary:hover {
+        background: var(--border-color);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-light);
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content" style="max-width: 800px">
+      <h1
+        style="
+          font-size: 24px;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 24px;
+        "
+      >
+        Settings
+      </h1>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('general')">
+          General
+        </button>
+        <button class="tab" onclick="switchTab('gateway')">Gateway</button>
+      </div>
+
+      <!-- General Tab -->
+      <div id="tab-general" class="tab-content active">
+        <div class="settings-section">
+          <div class="section-title">User Limits</div>
+          <div class="form-group">
+            <label>Maximum Users</label>
+            <input
+              type="number"
+              name="max_users"
+              placeholder="0 = unlimited"
+              min="0"
+            />
+            <small
+              >Set to 0 for unlimited users. Leave empty to keep current
+              value.</small
+            >
+          </div>
+          <div class="form-group">
+            <label>Maximum Stores per User</label>
+            <input
+              type="number"
+              name="max_stores_per_user"
+              placeholder="0 = unlimited"
+              min="0"
+            />
+            <small>Maximum number of stores each user can create.</small>
+          </div>
+          <div class="form-group">
+            <label>Maximum Products per Store</label>
+            <input
+              type="number"
+              name="max_products_per_store"
+              placeholder="0 = unlimited"
+              min="0"
+            />
+            <small>Maximum number of products per store.</small>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-title">Registration</div>
+          <div class="form-group">
+            <label>Allow New Registrations</label>
+            <select name="allow_registration">
+              <option value="true">Yes - Allow new users to register</option>
+              <option value="false">No - Registration closed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Default Verification Method</label>
+            <select name="verification_default">
+              <option value="email">Email (SMTP)</option>
+              <option value="whatsapp">WhatsApp</option>
+            </select>
+            <small>OTP will be sent via this method.</small>
+          </div>
+          <div class="form-group">
+            <label>Password Reset Method</label>
+            <select name="password_reset_method">
+              <option value="email">Email (SMTP)</option>
+              <option value="whatsapp">WhatsApp</option>
+            </select>
+            <small>Reset link will be sent via this method.</small>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-title">Beta Mode (Free Trial Period)</div>
+          <div class="form-group">
+            <label>Enable Beta Mode</label>
+            <select name="beta_mode_enabled">
+              <option value="false">Disabled - Users must pay for plans</option>
+              <option value="true">
+                Enabled - All users get free access to Beta Plan
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Default Beta Plan</label>
+            <select name="beta_default_plan_id" id="betaPlanSelect">
+              <!-- Populated by JS -->
+              <option value="2">Loading...</option>
+            </select>
+            <small
+              >Users on Free plan will be upgraded to this plan
+              automatically.</small
+            >
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-title">Bank Accounts (For Billing)</div>
+          <div class="form-group">
+            <label>Payment Instructions</label>
+            <textarea
+              name="billing_bank_details"
+              rows="5"
+              placeholder="Bank BCA: 123456789 (PT Sello)"
+              style="
+                width: 100%;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                padding: 10px;
+              "
+            ></textarea>
+            <small>Displayed to merchants during plan upgrade.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gateway Tab -->
+      <div id="tab-gateway" class="tab-content">
+        <div class="settings-section">
+          <div class="section-title">
+            WhatsApp Gateway
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              onclick="testGateway('whatsapp')"
+            >
+              Test
+            </button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Gateway URL</label>
+              <input
+                type="text"
+                name="wa_url"
+                placeholder="https://wa.example.com"
+              />
+            </div>
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" name="wa_username" placeholder="username" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="wa_password" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-title">
+            SMTP Email
+            <div style="display: flex; gap: 8px">
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                onclick="previewEmailTemplate()"
+              >
+                👁️ Preview
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                onclick="testGateway('email')"
+              >
+                📧 Test
+              </button>
+            </div>
+          </div>
+
+          <!-- Email Template Selector -->
+          <div class="form-group">
+            <label>Template Preview</label>
+            <select id="emailTemplateSelect" style="max-width: 300px">
+              <option value="otp">📱 Kode Verifikasi (OTP)</option>
+              <option value="password_reset">🔐 Reset Kata Sandi</option>
+              <option value="magic_link">✨ Magic Link Login</option>
+              <option value="welcome">🎉 Selamat Datang</option>
+            </select>
+            <small>Pilih template untuk preview atau test email.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Sender Email (From)</label>
+            <input
+              type="text"
+              name="smtp_from"
+              placeholder="noreply@yourdomain.com"
+            />
+            <small>Required if SMTP User is not a valid email address.</small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>SMTP Host</label>
+              <input
+                type="text"
+                name="smtp_host"
+                placeholder="smtp.gmail.com"
+              />
+            </div>
+            <div class="form-group">
+              <label>SMTP Port</label>
+              <input type="text" name="smtp_port" placeholder="587" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>SMTP User</label>
+              <input type="text" name="smtp_user" placeholder="you@gmail.com" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Password</label>
+              <input type="password" name="smtp_pass" placeholder="••••••••" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" onclick="saveSettings()">
+          Save Changes
+        </button>
+      </div>
+    </main>
+
+    <script src="/static/js/console-layout.js"></script>
+    <script>
+      const API_BASE = "/console/api";
+      const token = localStorage.getItem("admin_token");
+
+      if (!token) {
+        window.location.href = "/console/login";
+      }
+
+      // Tab switching
+      function switchTab(tab) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document
+          .querySelector(`[onclick="switchTab('${tab}')"]`)
+          .classList.add("active");
+        document.getElementById(`tab-${tab}`).classList.add("active");
+      }
+
+      // Load settings
+      async function loadSettings() {
+        try {
+          const res = await fetch(`${API_BASE}/settings/gateway`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+
+          // Populate form fields
+          Object.keys(data).forEach((key) => {
+            const input = document.querySelector(`[name="${key}"]`);
+            if (input) {
+              if (input.tagName === "SELECT") {
+                input.value = data[key];
+              } else {
+                input.value = data[key];
+              }
+            }
+          });
+
+          // Load Plans for Beta Select
+          fetch("/console/api/plans", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((r) => r.json())
+            .then((plans) => {
+              const select = document.getElementById("betaPlanSelect");
+              if (select && Array.isArray(plans)) {
+                select.innerHTML = '<option value="">Select Plan</option>';
+                plans.forEach((p) => {
+                  const opt = document.createElement("option");
+                  opt.value = p.id;
+                  opt.textContent = p.name + (p.is_active ? "" : " (Archived)");
+                  select.appendChild(opt);
+                });
+                // Set value if exists
+                if (data.beta_default_plan_id)
+                  select.value = data.beta_default_plan_id;
+              }
+            });
+        } catch (err) {
+          console.error("Failed to load settings:", err);
+        }
+      }
+
+      // Save settings
+      async function saveSettings() {
+        const formData = {};
+        document.querySelectorAll("input, select, textarea").forEach((el) => {
+          if (el.name && el.value !== "") {
+            formData[el.name] = el.value;
+          }
+        });
+
+        try {
+          const res = await fetch(`${API_BASE}/settings/gateway`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          if (res.ok) {
+            Swal.fire({
+              icon: "success",
+              title: "Saved!",
+              text: "Settings saved successfully.",
+              timer: 1500,
+              showConfirmButton: false,
+            });
+          } else {
+            const data = await res.json();
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: data.error || "Failed to save settings",
+            });
+          }
+        } catch (err) {
+          Swal.fire({ icon: "error", title: "Error", text: err.message });
+        }
+      }
+
+      // Test gateway
+      async function testGateway(type) {
+        let target, template;
+
+        if (type === "whatsapp") {
+          const { value } = await Swal.fire({
+            title: "Test WhatsApp",
+            input: "text",
+            inputLabel: "Phone Number",
+            inputPlaceholder: "08123456789",
+            showCancelButton: true,
+          });
+          if (!value) return;
+          target = value;
+        } else {
+          // Email - get template from dropdown
+          template = document.getElementById("emailTemplateSelect").value;
+
+          const templateNames = {
+            otp: "📱 Kode Verifikasi (OTP)",
+            password_reset: "🔐 Reset Kata Sandi",
+            magic_link: "✨ Magic Link Login",
+            welcome: "🎉 Selamat Datang",
+          };
+
+          const { value } = await Swal.fire({
+            title: "Test Email",
+            input: "email",
+            inputLabel: `Template: ${templateNames[template]}`,
+            inputPlaceholder: "email@example.com",
+            showCancelButton: true,
+            confirmButtonText: "Kirim Test Email",
+          });
+          if (!value) return;
+          target = value;
+        }
+
+        Swal.fire({
+          title: "Mengirim...",
+          text:
+            type === "email"
+              ? "Mengirim email dengan template HTML"
+              : "Mengirim pesan WhatsApp",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          const body = { type, target };
+          if (type === "email" && template) {
+            body.template = template;
+          }
+
+          const res = await fetch(`${API_BASE}/settings/test`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil!",
+              text: "Email berhasil dikirim. Cek inbox Anda.",
+            });
+          } else {
+            Swal.fire({ icon: "error", title: "Gagal", text: data.error });
+          }
+        } catch (err) {
+          Swal.fire({ icon: "error", title: "Error", text: err.message });
+        }
+      }
+
+      // Preview email template
+      function previewEmailTemplate() {
+        const template = document.getElementById("emailTemplateSelect").value;
+        const previewUrl = `${API_BASE}/settings/email-preview?template=${template}`;
+        window.open(
+          previewUrl,
+          "_blank",
+          "width=700,height=800,scrollbars=yes",
+        );
+      }
+
+      loadSettings();
+    </script>
+  </body>
+</html>

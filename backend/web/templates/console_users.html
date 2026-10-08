@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Users — Sello Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <style>
+      /* DataTables Customization */
+      .dataTables_wrapper .dataTables_length,
+      .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 20px;
+      }
+      .dataTables_wrapper .dataTables_length select,
+      .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: inherit;
+        font-size: 14px;
+        margin-left: 8px;
+        color: var(--text-primary);
+      }
+      .dataTables_wrapper .dataTables_filter input:focus,
+      .dataTables_wrapper .dataTables_length select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+      }
+      table.dataTable thead th {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px 24px !important;
+      }
+      table.dataTable tbody td {
+        padding: 16px 24px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        color: #334155;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+      table.dataTable.no-footer {
+        border-bottom: 1px solid #e2e8f0 !important;
+      }
+
+      /* User Info */
+      .table-user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .table-user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #e0f2fe;
+        color: #0369a1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        border: 1px solid #bae6fd;
+      }
+      .table-user-details {
+        display: flex;
+        flex-direction: column;
+      }
+      .table-user-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 14px;
+      }
+      .table-user-email {
+        font-size: 13px;
+        color: #64748b;
+      }
+
+      /* Buttons & Icons */
+      .btn-icon {
+        padding: 8px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        background: transparent;
+        cursor: pointer;
+        color: #475569;
+      }
+      .btn-icon:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+      .btn-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Badges */
+      .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+      .badge-plan {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+      }
+      .badge-plan.premium {
+        background: #eff6ff;
+        color: #3b82f6;
+        border: 1px solid #dbeafe;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .status-active {
+        background-color: #22c55e;
+        box-shadow: 0 0 0 2px #dcfce7;
+      }
+      .status-suspended {
+        background-color: #ef4444;
+        box-shadow: 0 0 0 2px #fee2e2;
+      }
+
+      /* Notion-style Filter Bar */
+      .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .filter-trigger {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .filter-trigger:hover,
+      .filter-trigger.active {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border-color: var(--border-dark);
+      }
+      .filter-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 4px;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 200px;
+        z-index: 50;
+        padding: 6px;
+      }
+      .filter-menu.show {
+        display: block;
+      }
+      .filter-option {
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-primary);
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      .filter-option:hover {
+        background: var(--bg-secondary);
+      }
+
+      .active-filter-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: #e0f2fe;
+        border: 1px solid #bae6fd;
+        border-radius: 16px;
+        font-size: 13px;
+        color: #0369a1;
+      }
+      .filter-remove {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        transition: background 0.2s;
+      }
+      .filter-remove:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .wrapper-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s;
+      }
+      .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 500px;
+        transform: scale(0.95) translateY(10px);
+        transition: all 0.2s;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .modal-overlay.show .modal-content {
+        transform: scale(1) translateY(0);
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .modal-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px;
+        font-size: 20px;
+      }
+      .modal-close:hover {
+        color: var(--text-primary);
+      }
+      .modal-body {
+        padding: 24px;
+      }
+      .modal-footer {
+        padding: 20px 24px;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: var(--primary);
+      }
+      .btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+      .btn-outline {
+        background: white;
+        border-color: var(--border-color);
+        color: var(--text-primary);
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+      <div
+        class="header"
+        style="
+          margin-bottom: 32px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        "
+      >
+        <div>
+          <h1
+            style="
+              font-size: 24px;
+              font-weight: 700;
+              color: var(--text-primary);
+              margin-bottom: 4px;
+            "
+          >
+            Created Users
+          </h1>
+          <p style="color: var(--text-secondary)">
+            Monitor dan kelola pengguna terdaftar.
+          </p>
+        </div>
+        <button
+          class="btn btn-primary"
+          onclick="openAddUserModal()"
+          style="display: flex; align-items: center; gap: 8px"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Tambah User
+        </button>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" id="filterBar" style="position: relative">
+        <!-- Filter Trigger -->
+        <div style="position: relative">
+          <button
+            class="filter-trigger"
+            id="addFilterBtn"
+            onclick="toggleFilterMenu()"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon
+                points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+              ></polygon>
+            </svg>
+            Filter
+          </button>
+          <!-- Dropdown Menu -->
+          <div class="filter-menu" id="filterMenu">
+            <div
+              style="
+                padding: 4px 8px;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text-muted);
+                text-transform: uppercase;
+              "
+            >
+              By Property
+            </div>
+            <div class="filter-option" onclick="showSubFilter('plan')">
+              📦 Plan
+            </div>
+            <div class="filter-option" onclick="showSubFilter('status')">
+              ⚡ Status
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Filters Container -->
+        <div
+          id="activeFilters"
+          style="display: flex; flex-wrap: wrap; gap: 8px"
+        ></div>
+      </div>
+
+      <div class="wrapper-card">
+        <table id="usersTable" class="table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Phone</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Toko</th>
+              <th>Joined At</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody">
+            <!-- DataTables populates this -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add User Modal -->
+      <div
+        class="modal-overlay"
+        id="addUserModal"
+        onclick="if (event.target === this) closeAddUserModal();"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Tambah User Baru</h2>
+            <button class="modal-close" onclick="closeAddUserModal()">✕</button>
+          </div>
+          <form id="addUserForm" onsubmit="submitAddUserForm(event)">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="Masukkan nama user"
+                />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="email@contoh.com"
+                />
+              </div>
+              <div class="form-group">
+                <label>WhatsApp</label>
+                <input
+                  type="tel"
+                  name="whatsapp"
+                  required
+                  placeholder="628123456789"
+                />
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  minlength="8"
+                  placeholder="Minimal 8 karakter"
+                />
+              </div>
+              <div class="form-group">
+                <label>Plan</label>
+                <select name="plan_id" id="planSelect">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-outline"
+                onclick="closeAddUserModal()"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                id="btnSubmitAddUser"
+              >
+                Simpan User
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/console-layout.js"></script>
+    <script>
+      const API_BASE = "/console/api";
+      const token = localStorage.getItem("admin_token");
+      if (!token) window.location.href = "/console/login";
+
+      let activeFilters = [];
+      let availablePlans = [];
+
+      async function apiRequest(url, options = {}) {
+        const res = await fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Request failed");
+        return data;
+      }
+
+      $(document).ready(async function () {
+        await loadPlans();
+        await loadUsers();
+      });
+
+      async function loadPlans() {
+        try {
+          const res = await apiRequest(`${API_BASE}/plans`);
+          availablePlans = res || [];
+        } catch (e) {
+          console.error("Failed to load plans", e);
+        }
+      }
+
+      async function loadUsers() {
+        try {
+          // Construct Query Params
+          let params = new URLSearchParams();
+          params.append("limit", "100"); // Load enough for client-side functionality
+
+          activeFilters.forEach((f) => {
+            if (f.type === "plan") params.append("plan_id", f.value);
+            if (f.type === "status") params.append("status", f.value);
+          });
+
+          const res = await apiRequest(
+            `${API_BASE}/users?${params.toString()}`,
+          );
+          if (!res || !res.data) {
+            return;
+          }
+          renderTable(res.data);
+        } catch (e) {
+          Swal.fire("Error", "Gagal memuat data users: " + e.message, "error");
+        }
+      }
+
+      function renderTable(users) {
+        if ($.fn.DataTable.isDataTable("#usersTable")) {
+          $("#usersTable").DataTable().destroy();
+        }
+
+        const tbody = document.getElementById("usersBody");
+        tbody.innerHTML = users
+          .map(
+            (u) => `
+            <tr>
+                <td>
+                    <div class="table-user-info">
+                        <div class="table-user-avatar">${u.name.charAt(0).toUpperCase()}</div>
+                        <div class="table-user-details">
+                            <span class="table-user-name">${u.name}</span>
+                            <span class="table-user-email">${u.email}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                   <div style="color: #64748b; font-size: 13px;">${u.phone || "-"}</div>
+                </td>
+                <td>
+                    ${renderPlanBadge(u.plan)}
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                      <span class="status-dot ${!u.is_suspended ? "status-active" : "status-suspended"}"></span>
+                      <span style="font-size: 13px; color: ${!u.is_suspended ? "#15803d" : "#991b1b"}; font-weight: 500;">
+                        ${!u.is_suspended ? "Active" : "Suspended"}
+                      </span>
+                    </div>
+                </td>
+                <td>
+                    <div style="font-weight: 600; color: #1e293b; text-align: center; width: 30px;">
+                        ${u.store_count || 0}
+                    </div>
+                </td>
+                <td>
+                  <div style="font-size: 13px; color: #64748b;">
+                    ${formatDate(u.created_at)}
+                  </div>
+                </td>
+                <td>
+                    <button class="btn-icon" onclick="viewUserDetail('${u.id}')" title="Lihat Detail">
+                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </button>
+                    ${renderStatusButton(u)}
+                </td>
+            </tr>
+        `,
+          )
+          .join("");
+
+        $("#usersTable").DataTable({
+          responsive: true,
+          pageLength: 10,
+          language: {
+            searchPlaceholder: "Cari user...",
+            info: "_START_-_END_ dari _TOTAL_",
+          },
+          columnDefs: [{ orderable: false, targets: 6 }],
+          dom: '<"d-flex justify-content-between align-items-center mb-4"lf>rt<"d-flex justify-content-between align-items-center mt-4"ip>',
+        });
+      }
+
+      function renderPlanBadge(plan) {
+        if (!plan) return '<span class="badge badge-plan">Free</span>';
+        const isPremium = plan.price_monthly > 0;
+        return `<span class="badge badge-plan ${isPremium ? "premium" : ""}">${plan.name}</span>`;
+      }
+
+      function renderStatusButton(u) {
+        if (u.is_suspended) {
+          return `<button class="btn-icon" style="color: #16a34a;" onclick="toggleUserStatus('${u.id}', 'activate')" title="Aktifkan User">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </button>`;
+        } else {
+          return `<button class="btn-icon" style="color: #dc2626;" onclick="toggleUserStatus('${u.id}', 'suspend')" title="Suspend User">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+              </button>`;
+        }
+      }
+
+      function formatDate(dateStr) {
+        return new Date(dateStr).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      /* --- Filter Logic --- */
+      function toggleFilterMenu() {
+        const menu = document.getElementById("filterMenu");
+        menu.classList.toggle("show");
+      }
+
+      // Close menu when clicking outside
+      document.addEventListener("click", function (event) {
+        const bar = document.getElementById("filterBar");
+        const menu = document.getElementById("filterMenu");
+        if (!bar.contains(event.target)) {
+          menu.classList.remove("show");
+        }
+      });
+
+      async function showSubFilter(type) {
+        toggleFilterMenu(); // close main menu
+
+        if (type === "plan") {
+          const options = availablePlans.reduce((acc, p) => {
+            acc[p.id] = p.name;
+            return acc;
+          }, {});
+
+          const { value: planId } = await Swal.fire({
+            title: "Filter by Plan",
+            input: "select",
+            inputOptions: options,
+            inputPlaceholder: "Pilih Plan",
+            showCancelButton: true,
+          });
+
+          if (planId) {
+            addFilter("plan", planId, `Plan: ${options[planId]}`);
+          }
+        } else if (type === "status") {
+          const { value: status } = await Swal.fire({
+            title: "Filter by Status",
+            input: "select",
+            inputOptions: {
+              active: "Active",
+              suspended: "Suspended",
+            },
+            inputPlaceholder: "Pilih Status",
+            showCancelButton: true,
+          });
+
+          if (status) {
+            addFilter(
+              "status",
+              status,
+              `Status: ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+            );
+          }
+        }
+      }
+
+      function addFilter(type, value, label) {
+        // Remove existing filter of same type if any (simplified logic)
+        activeFilters = activeFilters.filter((f) => f.type !== type);
+        activeFilters.push({ type, value, label });
+        renderActiveFilters();
+        loadUsers();
+      }
+
+      function removeFilter(index) {
+        activeFilters.splice(index, 1);
+        renderActiveFilters();
+        loadUsers();
+      }
+
+      function renderActiveFilters() {
+        const container = document.getElementById("activeFilters");
+        container.innerHTML = activeFilters
+          .map(
+            (f, i) => `
+              <div class="active-filter-chip">
+                  <span>${f.label}</span>
+                  <div class="filter-remove" onclick="removeFilter(${i})">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </div>
+              </div>
+          `,
+          )
+          .join("");
+
+        // Highlight filter button if filters active
+        const btn = document.getElementById("addFilterBtn");
+        if (activeFilters.length > 0) {
+          btn.classList.add("active");
+          btn.style.borderColor = "var(--primary)";
+          btn.style.color = "var(--primary)";
+        } else {
+          btn.classList.remove("active");
+          btn.style.borderColor = "";
+          btn.style.color = "";
+        }
+      }
+
+      async function toggleUserStatus(id, action) {
+        const verb = action === "suspend" ? "suspend" : "activate";
+        const title = action === "suspend" ? "Suspend User?" : "Aktifkan User?";
+        const text =
+          action === "suspend"
+            ? "User tidak akan bisa login atau mengakses toko mereka."
+            : "User akan kembali mendapatkan akses penuh.";
+
+        const result = await Swal.fire({
+          title: title,
+          text: text,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: action === "suspend" ? "#dc2626" : "#22c55e",
+          confirmButtonText:
+            action === "suspend" ? "Ya, Suspend" : "Ya, Aktifkan",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            await apiRequest(`${API_BASE}/users/${id}/${verb}`, {
+              method: "PUT",
+            });
+            Swal.fire("Berhasil", `User berhasil di-${verb}`, "success");
+            loadUsers();
+          } catch (e) {
+            Swal.fire("Gagal", e.message, "error");
+          }
+        }
+      }
+
+      function viewUserDetail(id) {
+        window.location.href = `/console/users/${id}`;
+      }
+
+      // --- Add User Modal Logic ---
+      function openAddUserModal() {
+        const select = document.getElementById("planSelect");
+        if (select.options.length === 0) {
+          select.innerHTML =
+            '<option value="">Pilih Plan...</option>' +
+            availablePlans
+              .map(
+                (p) =>
+                  `<option value="${p.id}">${p.name} - ${p.price_monthly === 0 ? "Gratis" : "Rp" + p.price_monthly.toLocaleString("id-ID")}/bln</option>`,
+              )
+              .join("");
+        }
+        document.getElementById("addUserForm").reset();
+        document.getElementById("addUserModal").classList.add("show");
+      }
+
+      function closeAddUserModal() {
+        document.getElementById("addUserModal").classList.remove("show");
+      }
+
+      async function submitAddUserForm(e) {
+        e.preventDefault();
+        const form = e.target;
+        const btn = document.getElementById("btnSubmitAddUser");
+
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+
+        const payload = {
+          name: form.name.value,
+          email: form.email.value,
+          whatsapp: form.whatsapp.value,
+          password: form.password.value,
+        };
+
+        if (form.plan_id.value) {
+          payload.plan_id = parseInt(form.plan_id.value);
+        }
+
+        try {
+          await apiRequest(`${API_BASE}/users`, {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          Swal.fire("Berhasil", "User baru telah ditambahkan", "success");
+          closeAddUserModal();
+          loadUsers();
+        } catch (error) {
+          Swal.fire("Gagal", error.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Simpan User";
+        }
+      }
+    </script>
+  </body>
+</html>

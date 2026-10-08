@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toko Saya — Sello</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .stores-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .store-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .store-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--accent);
+      }
+      .store-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .store-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .store-badge {
+        padding: 4px 10px;
+        background: var(--accent-light);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: var(--radius-full);
+      }
+      .store-url {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: var(--bg-secondary);
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+      }
+      .store-url code {
+        flex: 1;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .store-url button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 4px;
+      }
+      .store-url button:hover {
+        color: var(--accent);
+      }
+      .store-stats {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 16px;
+      }
+      .store-stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .store-stat-label {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .store-actions {
+        display: flex;
+        gap: 8px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-light);
+      }
+      .add-store-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        transition: var(--transition);
+        background: transparent;
+      }
+      .add-store-card:hover {
+        border-color: var(--accent);
+        background: var(--accent-light);
+      }
+      .add-store-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--bg-secondary);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+      .add-store-icon svg {
+        width: 24px;
+        height: 24px;
+        color: var(--text-muted);
+      }
+      .add-store-text {
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+      }
+      .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        transform: translateY(20px);
+        transition: var(--transition);
+      }
+      .modal-overlay.show .modal {
+        transform: translateY(0);
+      }
+      .modal-header h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+      .modal-header p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+      }
+      .modal-actions .btn {
+        flex: 1;
+      }
+      .input-hint {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div class="header-left">
+          <h1>
+            Toko Saya
+            <span
+              id="storeCountInfo"
+              style="
+                font-size: 14px;
+                font-weight: 400;
+                color: var(--text-muted);
+              "
+            ></span>
+          </h1>
+          <p>Kelola semua toko online Anda</p>
+        </div>
+      </header>
+      <div class="stores-grid" id="storesGrid"></div>
+
+      <div class="modal-overlay" id="createModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h2>Buat Toko Baru</h2>
+            <p>Isi detail toko untuk memulai</p>
+          </div>
+          <form id="createStoreForm">
+            <div class="form-group">
+              <label>Nama Toko</label>
+              <input
+                type="text"
+                id="storeName"
+                name="name"
+                placeholder="Contoh: Toko Fashion"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>URL Toko</label>
+              <input
+                type="text"
+                id="storeSlug"
+                name="slug"
+                placeholder="toko-fashion"
+                required
+                pattern="[a-z0-9-]+"
+              />
+              <div class="input-hint">
+                sello.app/s/<span id="slugPreview">toko-anda</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Nomor WhatsApp</label>
+              <input
+                type="tel"
+                id="storeWhatsapp"
+                name="whatsapp"
+                placeholder="628123456789"
+                required
+              />
+            </div>
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="btn btn-outline"
+                onclick="closeModal()"
+              >
+                Batal
+              </button>
+              <button type="submit" class="btn btn-primary">Buat Toko</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/admin-layout.js?v=4"></script>
+    <script>
+      let userMaxStores = 0; // Will be set from user plan
+
+      async function loadStoresPage() {
+        // Fetch user info to get store limit
+        const userInfo = await apiRequest("/api/auth/me");
+        if (userInfo && userInfo.user && userInfo.user.plan) {
+          userMaxStores = userInfo.user.plan.max_stores || 0;
+        }
+
+        const storesRaw = await apiRequest("/api/stores");
+        const stores = Array.isArray(storesRaw) ? storesRaw : [];
+
+        renderStores(stores);
+      }
+
+      function renderStores(stores) {
+        const grid = document.getElementById("storesGrid");
+
+        // Update header with store count info
+        const countInfo = document.getElementById("storeCountInfo");
+
+        let limitText = "Unlimited";
+        if (userMaxStores > 0 && userMaxStores < 1000) {
+          limitText = userMaxStores + " toko";
+        }
+
+        if (countInfo) {
+          countInfo.textContent = `(${stores.length} / ${limitText})`;
+        }
+
+        let html = stores
+          .map(
+            (store) => `
+          <div class="store-card" onclick="selectStore('${store.id}')">
+            <div class="store-card-header">
+              <span class="store-name">${store.name}</span>
+              <span class="store-badge">Aktif</span>
+            </div>
+            <div class="store-url">
+              <code>${store.slug}.sello.id</code>
+              <button onclick="event.stopPropagation(); copyUrl('${store.slug}.sello.id')" title="Copy">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <div class="store-stats">
+              <div><div class="store-stat-value">${store.product_count || 0}</div><div class="store-stat-label">Produk</div></div>
+            </div>
+            <div class="store-actions">
+              <a href="https://${store.slug}.sello.id" target="_blank" class="btn btn-outline btn-sm" onclick="event.stopPropagation()">Lihat</a>
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); manageStore('${store.id}')">Kelola</button>
+            </div>
+          </div>
+        `,
+          )
+          .join("");
+
+        // Only show Add Store card if under limit (0 = unlimited)
+        // Only show Add Store card if under limit (0 = treat as unlimited for safety, or check plan)
+        // If userMaxStores is 0 (issue reading plan), let's assume 1 (SAFE DEFAULT) to prevent abuse
+        // But if it's truly unlimited (Business), backend sends high number.
+        const effectiveLimit = userMaxStores > 0 ? userMaxStores : 1;
+
+        const canAddStore = stores.length < effectiveLimit;
+
+        if (canAddStore) {
+          html += `<div class="add-store-card" onclick="openModal()"><div class="add-store-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span class="add-store-text">Tambah Toko</span></div>`;
+        } else {
+          html += `<div class="add-store-card" style="opacity: 0.5; cursor: not-allowed;" onclick="showToast('Anda telah mencapai batas ${effectiveLimit} toko. Upgrade paket untuk menambah lebih banyak.', 'error')"><div class="add-store-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span class="add-store-text">Batas Toko Tercapai (${stores.length}/${effectiveLimit})</span></div>`;
+        }
+        grid.innerHTML = html;
+      }
+
+      function selectStore(id) {
+        localStorage.setItem("sello_current_store", id);
+        window.location.href = "/dashboard";
+      }
+      function manageStore(id) {
+        localStorage.setItem("sello_current_store", id);
+        window.location.href = "/dashboard/settings";
+      }
+      function copyUrl(url) {
+        navigator.clipboard.writeText(`https://${url}`);
+        showToast("URL disalin!", "success");
+      }
+      function openModal() {
+        document.getElementById("createModal").classList.add("show");
+      }
+      function closeModal() {
+        document.getElementById("createModal").classList.remove("show");
+      }
+      function generateSlug(name) {
+        return name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .trim();
+      }
+
+      async function createStore(e) {
+        e.preventDefault();
+        const form = e.target;
+        const result = await apiRequest("/api/stores", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.name.value,
+            slug: form.slug.value,
+            whatsapp: form.whatsapp.value,
+          }),
+        });
+        if (result?.id) {
+          showToast("Toko berhasil dibuat!", "success");
+          closeModal();
+          loadStoresPage();
+          form.reset();
+          adminLayout.loadStores();
+        } else showToast(result?.error || "Gagal", "error");
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadStoresPage();
+        document
+          .getElementById("createStoreForm")
+          .addEventListener("submit", createStore);
+        document.getElementById("storeName").addEventListener("input", (e) => {
+          const slug = generateSlug(e.target.value);
+          document.getElementById("storeSlug").value = slug;
+          document.getElementById("slugPreview").textContent =
+            slug || "toko-anda";
+        });
+        document
+          .getElementById("createModal")
+          .addEventListener("click", (e) => {
+            if (e.target.classList.contains("modal-overlay")) closeModal();
+          });
+      });
+    </script>
+  </body>
+</html>

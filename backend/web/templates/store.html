@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Store.Name}} — Katalog Produk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/store.css" />
+  </head>
+  <body class="store-page">
+    <!-- Store Header -->
+    <header class="store-header">
+      <div class="container">
+        <div class="store-header-content">
+            {{if .Store.LogoURL}}
+            <div class="store-logo-wrapper">
+                <img src="{{.Store.LogoURL}}" alt="{{.Store.Name}}" class="store-logo" />
+            </div>
+            {{end}}
+            <div class="store-info">
+                <h1 class="store-name">{{.Store.Name}}</h1>
+                <div class="store-meta">
+                    <span class="store-badge">🟢 Online</span>
+                </div>
+                {{if .Store.Description}}
+                <p class="store-desc">{{.Store.Description}}</p>
+                {{end}}
+            </div>
+        </div>
+        <a
+          href="https://wa.me/{{.Store.Whatsapp}}"
+          class="btn btn-whatsapp"
+          target="_blank"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+            />
+          </svg>
+          Hubungi Kami
+        </a>
+      </div>
+    </header>
+
+    <!-- Products Grid -->
+    <main class="store-main">
+      <div class="container">
+        <!-- Search & Filter -->
+        <div class="store-filter-section">
+            <form action="/s/{{.Store.Slug}}" method="GET" class="store-search-form">
+                <input type="hidden" name="cat" value="{{.SelectedCat}}">
+                <div class="search-input-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" name="q" placeholder="Cari produk..." value="{{.SearchQuery}}">
+                </div>
+            </form>
+
+            <div class="category-scroll">
+                <a href="/s/{{.Store.Slug}}{{if .SearchQuery}}?q={{.SearchQuery}}{{end}}" class="cat-chip {{if eq .SelectedCat ""}}active{{end}}">
+                    Semua
+                </a>
+                {{range .Categories}}
+                <a href="/s/{{$.Store.Slug}}?cat={{.ID}}{{if $.SearchQuery}}&q={{$.SearchQuery}}{{end}}" class="cat-chip {{if eq $.SelectedCat .ID.String}}active{{end}}">
+                    {{.Name}}
+                </a>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="products-header">
+          <h2>Produk Kami</h2>
+          <span class="product-count">{{len .Products}} produk</span>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+          {{range .Products}}
+          <div class="product-card">
+            {{if $.IsSubdomain}}
+            <a href="/product/{{if .Slug}}{{.Slug}}{{else}}{{.ID}}{{end}}" class="product-card-link">
+            {{else}}
+            <a href="/s/{{$.Store.Slug}}/p/{{if .Slug}}{{.Slug}}{{else}}{{.ID}}{{end}}" class="product-card-link">
+            {{end}}
+              <div class="product-image">
+                {{if .ImageURL}}
+                <img src="{{.ImageURL}}" alt="{{.Name}}" loading="lazy" />
+                {{else}}
+                <div class="product-placeholder">
+                  <span>📦</span>
+                </div>
+                {{end}}
+              </div>
+              <div class="product-info">
+                <h3 class="product-name">{{.Name}}</h3>
+                {{if .Description}}
+                <p class="product-desc">{{.Description}}</p>
+                {{end}}
+                <div class="product-footer">
+                  <span class="product-price">Rp {{.Price}}</span>
+                  <object>
+                    <a
+                      href="https://wa.me/{{$.Store.Whatsapp}}?text=Halo, saya tertarik dengan {{.Name}} (Rp {{.Price}})"
+                      class="btn btn-sm btn-whatsapp"
+                      target="_blank"
+                      onclick="event.stopPropagation()"
+                    >
+                      Pesan
+                    </a>
+                  </object>
+                </div>
+              </div>
+            </a>
+          </div>
+          {{else}}
+          <div class="empty-state">
+            <span class="empty-icon">📦</span>
+            <h3>Belum ada produk</h3>
+            <p>Toko ini belum menambahkan produk</p>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </main>
+
+
+
+    <!-- Branding Badge -->
+    {{template "branding_badge.html" .}}
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

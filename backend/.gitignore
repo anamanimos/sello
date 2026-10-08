@@ -1,0 +1,46 @@
+# Environment
+.env
+*.env
+*.env.*
+!.env.example
+
+# SSH & Secrets
+ssh/
+*.key
+*.pub
+*.pem
+*.crt
+
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+sello-app*
+server
+main
+
+# Go
+go.work
+vendor/
+tmp/
+
+# Logs & Debugging
+*.log
+log.txt
+server.log
+system_debug.log
+debug_*.txt
+
+# Uploads
+web/uploads/*
+!web/uploads/.gitkeep
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

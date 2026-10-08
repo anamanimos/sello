@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tema — Sello</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+
+      .theme-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .theme-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-light);
+      }
+
+      .theme-card.active-theme {
+        border: 2px solid var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-light);
+      }
+
+      .theme-thumb {
+        aspect-ratio: 16/10;
+        background: var(--bg-secondary);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .theme-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .theme-card:hover .theme-thumb img {
+        transform: scale(1.05);
+      }
+
+      .theme-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          var(--bg-secondary) 0%,
+          var(--border-light) 100%
+        );
+        color: var(--text-muted);
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .theme-info {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+
+      .theme-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .theme-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .theme-desc {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-bottom: 20px;
+        flex: 1; /* Pushes footer down */
+      }
+
+      .theme-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: auto;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .badge-active {
+        background: #dcfce7; /* Green-100 */
+        color: #166534; /* Green-800 */
+      }
+
+      .badge-premium {
+        background: #fef9c3; /* Yellow-100 */
+        color: #854d0e; /* Yellow-800 */
+      }
+
+      .empty-themes {
+        text-align: center;
+        padding: 60px;
+        grid-column: 1 / -1;
+      }
+
+      /* Overlay for hover actions if desired, but separate buttons are clearer */
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div class="header-left">
+          <h1>Galeri Tema</h1>
+          <p>Pilih tampilan terbaik untuk toko online Anda</p>
+        </div>
+        <div class="header-right">
+          <a href="/dashboard/theme/customize" class="btn btn-outline">
+            <i data-lucide="settings"></i> Pengaturan Tema
+          </a>
+        </div>
+      </header>
+
+      <div class="theme-grid" id="themeGrid">
+        <!-- Themes will be loaded here via JS -->
+        <div class="empty-themes">
+          <span class="loading-spinner">⏳ Memuat tema...</span>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/admin-layout.js?v=2"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+        loadThemes();
+      });
+
+      async function loadThemes() {
+        try {
+          // Fetch active theme first
+          const storeId = getCurrentStoreId();
+          if (!storeId) return;
+
+          const [themesRes, activeThemeRes] = await Promise.all([
+            apiRequest("/api/themes"), // List all themes
+            apiRequest(`/api/stores/${storeId}/theme`), // Get active theme
+          ]);
+
+          const themes = themesRes || [];
+          const activeThemeId = activeThemeRes?.theme_name || null;
+          const container = document.getElementById("themeGrid");
+
+          if (themes.length === 0) {
+            container.innerHTML = `
+                        <div class="empty-themes">
+                            <h3>Belum ada tema tersedia</h3>
+                            <p>Silakan hubungi administrator.</p>
+                        </div>
+                    `;
+            return;
+          }
+
+          container.innerHTML = themes
+            .map((theme) => {
+              const isActive = theme.id === activeThemeId;
+              const isPremium = theme.is_premium;
+
+              // Button Logic
+              let buttons = "";
+              if (isActive) {
+                buttons = `
+                            <a href="/dashboard/theme/customize" class="btn btn-primary" style="flex:1">
+                                <i data-lucide="edit-3"></i> Kustomisasi
+                            </a>
+                        `;
+              } else {
+                buttons = `
+                            <button onclick="activateTheme('${theme.id}')" class="btn btn-outline" style="flex:1">
+                                Pilih Tema
+                            </button>
+                            ${
+                              isPremium
+                                ? ""
+                                : `
+                            <a href="/dashboard/theme/preview/${theme.id}" target="_blank" class="btn btn-icon" title="Preview">
+                                <i data-lucide="eye"></i>
+                            </a>`
+                            }
+                        `;
+              }
+
+              // Image Logic with Placeholder Fallback
+              // We use onerror to swap to placeholder logic
+              const imgSrc = theme.thumbnail_url || "";
+              const hasImage = imgSrc.trim() !== "";
+
+              return `
+                    <div class="theme-card ${isActive ? "active-theme" : ""}">
+                        <div class="theme-thumb">
+                            ${
+                              hasImage
+                                ? `<img src="${imgSrc}" alt="${theme.name}" onerror="handleThemeImageError(this, '${theme.name.replace(/'/g, "\\'")}')">`
+                                : getPlaceholderHTML(theme.name)
+                            }
+                        </div>
+                        <div class="theme-info">
+                            <div class="theme-header-row">
+                                <div class="theme-name">${theme.name}</div>
+                                ${isActive ? '<span class="badge badge-active">Dipakai</span>' : ""}
+                                ${isPremium && !isActive ? '<span class="badge badge-premium">Premium</span>' : ""}
+                            </div>
+                            <div class="theme-desc">
+                                ${theme.description || "Deskripsi tidak tersedia."}
+                            </div>
+                            <div class="theme-actions">
+                                ${buttons}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+            })
+            .join("");
+
+          lucide.createIcons();
+        } catch (error) {
+          console.error("Failed to load themes:", error);
+          showToast("Gagal memuat daftar tema", "error");
+        }
+      }
+
+      function getPlaceholderHTML(name) {
+        return `
+                <div class="theme-placeholder">
+                    <i data-lucide="image" size="48" style="opacity:0.5; width:48px; height:48px;"></i>
+                    <span style="font-weight:500; font-size:14px;">${name}</span>
+                </div>
+            `;
+      }
+
+      function handleThemeImageError(imgElement, themeName) {
+        imgElement.onerror = null;
+        const parent = imgElement.parentElement;
+        parent.innerHTML = getPlaceholderHTML(themeName);
+        lucide.createIcons();
+      }
+
+      async function activateTheme(themeId) {
+        const storeId = getCurrentStoreId();
+        if (!storeId) return;
+
+        // Confirm first
+        const result = await Swal.fire({
+          title: "Ganti Tema?",
+          text: "Tema toko Anda akan berubah. Konfigurasi tema lama akan tersimpan di history.",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3b82f6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Ya, Ganti Tema",
+          cancelButtonText: "Batal",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            await apiRequest(`/api/stores/${storeId}/theme`, {
+              method: "PUT",
+              body: JSON.stringify({ theme_id: themeId }),
+            });
+
+            showToast("Tema berhasil diganti!", "success");
+            loadThemes(); // Reload UI
+          } catch (e) {
+            showToast("Gagal mengganti tema", "error");
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

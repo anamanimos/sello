@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Product.Name}} — {{.Store.Name}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/store.css" />
+    <style>
+      .product-detail-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+      .product-detail-image-container {
+        width: 100%;
+        background: var(--gray-100);
+        aspect-ratio: 1; /* Square by default */
+        position: relative;
+      }
+      .product-detail-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Show full image */
+      }
+      .product-detail-content {
+        padding: 24px;
+      }
+      .product-detail-price {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 12px;
+      }
+      .product-detail-desc {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--gray-700);
+        white-space: pre-line;
+        margin-bottom: 24px;
+      }
+      .back-nav {
+        padding: 16px 0;
+      }
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--gray-600);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+      }
+      .back-btn:hover {
+        color: var(--gray-900);
+      }
+
+      @media (min-width: 768px) {
+        .product-detail-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 32px;
+          align-items: start;
+        }
+        .product-detail-image-container {
+          border-radius: var(--radius-lg);
+        }
+      }
+    </style>
+  </head>
+  <body class="store-page">
+    <header class="store-header">
+      <div class="container">
+        <div
+          class="store-header-content"
+          style="flex-direction: row; align-items: center; gap: 12px"
+        >
+          {{if .Store.LogoURL}}
+          <div
+            class="store-logo-wrapper"
+            style="width: 40px; height: 40px; border-width: 1px"
+          >
+            <img
+              src="{{.Store.LogoURL}}"
+              alt="{{.Store.Name}}"
+              class="store-logo"
+            />
+          </div>
+          {{end}}
+          <div class="store-info" style="align-items: start">
+            <a
+              href="/s/{{.Store.Slug}}"
+              class="store-name"
+              style="text-decoration: none; font-size: 18px"
+              >{{.Store.Name}}</a
+            >
+            <span class="store-badge" style="font-size: 11px; padding: 2px 8px"
+              >🟢 Online</span
+            >
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="store-main">
+      <div class="container">
+        <div class="back-nav">
+          <a href="/s/{{.Store.Slug}}" class="back-btn">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Kembali ke Toko
+          </a>
+        </div>
+
+        <div class="product-detail-card">
+          <div class="product-detail-layout">
+            <div class="product-detail-image-container">
+              {{if .Product.ImageURL}}
+              <img
+                src="{{.Product.ImageURL}}"
+                alt="{{.Product.Name}}"
+                class="product-detail-image"
+              />
+              {{else}}
+              <div class="product-placeholder"><span>📦</span></div>
+              {{end}}
+            </div>
+
+            <div class="product-detail-content">
+              <h1
+                style="
+                  font-size: 24px;
+                  font-weight: 700;
+                  color: var(--gray-900);
+                  margin-bottom: 8px;
+                "
+              >
+                {{.Product.Name}}
+              </h1>
+              <div class="product-detail-price">Rp {{.Product.Price}}</div>
+
+              <a
+                href="https://wa.me/{{.Store.Whatsapp}}?text=Halo {{.Store.Name}}, saya tertarik dengan produk *{{.Product.Name}}* seharga Rp {{.Product.Price}}. Apakah stok masih ada?"
+                class="btn btn-whatsapp"
+                target="_blank"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+                  />
+                </svg>
+                Beli via WhatsApp
+              </a>
+
+              <div
+                style="border-top: 1px solid var(--gray-100); margin: 24px 0"
+              ></div>
+
+              <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px">
+                Deskripsi Produk
+              </h3>
+              <p class="product-detail-desc">{{.Product.Description}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="store-footer">
+      <div class="container">
+        <p>Powered by <a href="/">Sello</a></p>
+      </div>
+    </footer>
+  </body>
+</html>

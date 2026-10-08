@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tambah Produk — Sello</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="stylesheet" href="/static/css/product-form.css" />
+    <!-- Quill WYSIWYG -->
+    <link
+      href="https://cdn.quilljs.com/1.3.6/quill.snow.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill-emoji@0.2.0/dist/quill-emoji.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill-emoji@0.2.0/dist/quill-emoji.min.js"></script>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div class="header-left">
+          <a href="/dashboard/products" class="back-link">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="15,18 9,12 15,6" />
+            </svg>
+            Kembali
+          </a>
+          <h1>Tambah Produk</h1>
+        </div>
+      </header>
+
+      <form id="productForm">
+        <div class="form-layout">
+          <div class="form-section">
+            <h2>Informasi Produk</h2>
+            <div class="form-group">
+              <label>Nama Produk *</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Contoh: Sepatu Premium"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Kategori</label>
+              <select id="categorySelect">
+                <option value="">Pilih Kategori</option>
+              </select>
+              <div class="input-hint">
+                Kelola kategori di menu
+                <a href="/dashboard/categories">Kategori</a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Harga (Rp) *</label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                placeholder="250000"
+                min="0"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Harga Diskon (Rp)</label>
+              <input
+                type="number"
+                id="discountPrice"
+                name="discount_price"
+                placeholder="Kosongkan jika tidak ada diskon"
+                min="0"
+              />
+              <small
+                style="
+                  color: var(--text-muted);
+                  font-size: 12px;
+                  margin-top: 4px;
+                  display: block;
+                "
+              >
+                Harus lebih rendah dari harga normal
+              </small>
+            </div>
+            <div
+              class="form-group"
+              id="externalLinkGroup"
+              style="display: none"
+            >
+              <label>Link Eksternal / Affiliate (Opsional)</label>
+              <input
+                type="url"
+                id="externalLink"
+                name="external_link"
+                placeholder="https://tokopedia.com/..."
+              />
+              <small
+                style="
+                  color: var(--text-muted);
+                  font-size: 12px;
+                  margin-top: 4px;
+                  display: block;
+                "
+              >
+                Jika diisi, tombol beli akan mengarah ke link ini (bukan
+                WhatsApp).
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Deskripsi</label>
+              <div
+                id="quill-editor"
+                style="height: 200px; background: white"
+              ></div>
+              <input type="hidden" name="description" id="description" />
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>Gambar Produk</h2>
+            <div class="images-container">
+              <div class="images-grid" id="imagesGrid">
+                <div class="add-image-btn" id="addImageBtn">
+                  <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                    multiple
+                    hidden
+                  />
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span>Tambah Gambar</span>
+                </div>
+              </div>
+              <p class="upload-hint">
+                Max 5 gambar • Max 5MB per gambar • Drag untuk reorder
+              </p>
+            </div>
+            <div class="storage-info">
+              <div class="storage-bar">
+                <div
+                  class="storage-fill"
+                  id="storageFill"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <span class="storage-text"
+                ><span id="storageUsed">0</span> / 50 MB</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a href="/dashboard/products" class="btn btn-outline">Batal</a>
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            Simpan Produk
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <script src="/static/js/admin-layout.js?v=2"></script>
+    <script src="/static/js/admin-layout.js?v=2"></script>
+    <script src="/static/js/product-form.js?v=3"></script>
+  </body>
+</html>

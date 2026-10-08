@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Kupon — Sello Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <style>
+      /* Offcanvas Sidebar Styles */
+      .offcanvas-backdrop {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .offcanvas-backdrop.show {
+        display: block;
+        opacity: 1;
+      }
+
+      .offcanvas {
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        right: -500px; /* Start off-screen */
+        width: 450px;
+        height: 100vh;
+        background-color: white;
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+      }
+      .offcanvas.show {
+        right: 0;
+      }
+
+      .offcanvas-header {
+        padding: 24px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+      }
+      .offcanvas-header h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+      }
+      .offcanvas-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        padding: 4px;
+        line-height: 1;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+      .offcanvas-close:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+
+      .offcanvas-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .offcanvas-footer {
+        padding: 20px 24px;
+        background: #f9fafb;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      /* Form Styling */
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+      .form-input,
+      select.form-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      /* DataTables Customization */
+      .dataTables_wrapper .dataTables_length,
+      .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 20px;
+      }
+      .dataTables_wrapper .dataTables_length select,
+      .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: inherit;
+        font-size: 14px;
+        margin-left: 8px;
+      }
+      .dataTables_wrapper .dataTables_filter input:focus,
+      .dataTables_wrapper .dataTables_length select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+      }
+      table.dataTable thead th {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px 24px !important;
+      }
+      table.dataTable tbody td {
+        padding: 16px 24px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        color: #334155;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+      table.dataTable.no-footer {
+        border-bottom: 1px solid #e2e8f0 !important;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .badge-blue {
+        background: #eff6ff;
+        color: #3b82f6;
+        border: 1px solid #dbeafe;
+      }
+      .badge-purple {
+        background: #f3e8ff;
+        color: #9333ea;
+        border: 1px solid #e9d5ff;
+      }
+      .badge-gray {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+      <div
+        class="header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        "
+      >
+        <div>
+          <h1
+            style="
+              font-size: 24px;
+              font-weight: 700;
+              color: var(--text-primary);
+              margin-bottom: 4px;
+            "
+          >
+            Kelola Kupon
+          </h1>
+          <p style="color: var(--text-secondary)">
+            Buat kode diskon untuk promosi paket langganan.
+          </p>
+        </div>
+        <button
+          onclick="openCreateOffcanvas()"
+          class="btn btn-primary"
+          style="
+            padding: 10px 20px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+          "
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            style="margin-right: 8px; vertical-align: text-bottom"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Buat Kupon Baru
+        </button>
+      </div>
+
+      <div
+        class="panel"
+        style="
+          background: white;
+          border-radius: 16px;
+          border: 1px solid var(--border-color);
+          padding: 24px;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        "
+      >
+        <table id="couponsTable" class="table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Tipe Diskon</th>
+              <th>Nilai</th>
+              <th>Batas Pemakaian</th>
+              <th>Kadaluarsa</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="couponsTableBody">
+            <!-- DataTables will populate this -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Offcanvas Backdrop -->
+    <div
+      id="offcanvasBackdrop"
+      class="offcanvas-backdrop"
+      onclick="closeOffcanvas()"
+    ></div>
+
+    <!-- Offcanvas Form (Sidebar) -->
+    <div id="couponOffcanvas" class="offcanvas">
+      <form
+        id="couponForm"
+        onsubmit="handleCreate(event)"
+        style="display: flex; flex-direction: column; height: 100%"
+      >
+        <div class="offcanvas-header">
+          <h2>Buat Kupon Baru</h2>
+          <button
+            type="button"
+            class="offcanvas-close"
+            onclick="closeOffcanvas()"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="offcanvas-body">
+          <div class="form-group">
+            <label>Kode Kupon</label>
+            <input
+              type="text"
+              name="code"
+              class="form-input"
+              required
+              placeholder="e.g. PROMO50"
+              style="text-transform: uppercase"
+            />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+            <div class="form-group">
+              <label>Tipe</label>
+              <select name="type" class="form-input" required>
+                <option value="fixed">Nominal (Rp)</option>
+                <option value="percentage">Persentase (%)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Nilai</label>
+              <input
+                type="number"
+                name="value"
+                class="form-input"
+                required
+                placeholder="50000"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Limit Pemakaian (0 = Unlimited)</label>
+            <input
+              type="number"
+              name="usage_limit"
+              class="form-input"
+              value="0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Min. Pembelian (Rp)</label>
+            <input
+              type="number"
+              name="min_purchase"
+              class="form-input"
+              value="0"
+            />
+            <div class="form-hint">
+              Minimal total belanja agar kupon bisa dipakai.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Max. Diskon (Khusus %)</label>
+            <input
+              type="number"
+              name="max_discount"
+              class="form-input"
+              value="0"
+            />
+            <div class="form-hint">
+              Maksimal potongan harga jika tipe persentase.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tanggal Kadaluarsa</label>
+            <input type="date" name="expires_at" class="form-input" />
+          </div>
+        </div>
+
+        <div class="offcanvas-footer">
+          <button
+            type="button"
+            onclick="closeOffcanvas()"
+            class="btn btn-outline"
+            style="border-color: #e2e8f0; color: #475569"
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="padding-left: 24px; padding-right: 24px"
+          >
+            Simpan Kupon
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script src="/static/js/console-layout.js"></script>
+    <script>
+      let table;
+      const API_BASE = "/console/api";
+      const token = localStorage.getItem("admin_token");
+      if (!token) window.location.href = "/console/login";
+
+      $(document).ready(function () {
+        loadCoupons();
+      });
+
+      async function loadCoupons() {
+        try {
+          const res = await fetch(`${API_BASE}/coupons`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.ok) {
+            const coupons = await res.json();
+            renderTable(coupons);
+          } else {
+            const err = await res.json();
+            // Only show error if it's not empty/generic, to avoid spam if user didn't restart
+            console.error("Failed to load coupons:", err);
+            // If error contains details, show alert
+            if (err.error && err.error.includes(":")) {
+              Swal.fire("Gagal", err.error, "error");
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function renderTable(data) {
+        if ($.fn.DataTable.isDataTable("#couponsTable")) {
+          $("#couponsTable").DataTable().destroy();
+        }
+
+        const tbody = document.getElementById("couponsTableBody");
+        if (!data || data.length === 0) {
+          tbody.innerHTML = "";
+        } else {
+          tbody.innerHTML = data
+            .map(
+              (c) => `
+                <tr>
+                    <td><span class="badge badge-blue" style="font-size:13px;">${c.code}</span></td>
+                    <td>${c.type === "percentage" ? "Persentase" : "Nominal Tetap"}</td>
+                    <td>
+                        <div style="font-weight:600; color:#0f172a;">
+                            ${c.type === "percentage" ? c.value + "%" : "Rp " + c.value.toLocaleString()}
+                        </div>
+                    </td>
+                    <td>
+                        ${
+                          c.usage_limit === 0
+                            ? '<span class="badge badge-gray">Unlimited</span>'
+                            : `<span style="font-family:monospace;">${c.used_count || 0} / ${c.usage_limit}</span>`
+                        }
+                    </td>
+                    <td>${c.expires_at ? new Date(c.expires_at).toLocaleDateString() : "-"}</td>
+                    <td>
+                        <button onclick="deleteCoupon('${c.id}')" 
+                                class="btn btn-sm" 
+                                style="background: #fef2f2; color: #dc2626; padding: 6px 10px; border: 1px solid #fee2e2;"
+                                title="Hapus">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </td>
+                </tr>
+            `,
+            )
+            .join("");
+        }
+
+        // Initialize DataTable
+        table = $("#couponsTable").DataTable({
+          responsive: true,
+          pageLength: 10,
+          lengthMenu: [5, 10, 25, 50],
+          language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Cari kupon...",
+            lengthMenu: "Tampil _MENU_",
+            info: "Menampilkan _START_-_END_ dari _TOTAL_",
+            paginate: { first: "«", last: "»", next: "›", previous: "‹" },
+            emptyTable: "Belum ada kupon",
+          },
+          columnDefs: [{ orderable: false, targets: 5 }],
+          dom: '<"d-flex justify-content-between align-items-center mb-4"lf>rt<"d-flex justify-content-between align-items-center mt-4"ip>',
+        });
+      }
+
+      function openCreateOffcanvas() {
+        document.getElementById("couponForm").reset();
+        document.getElementById("offcanvasBackdrop").classList.add("show");
+        document.getElementById("couponOffcanvas").classList.add("show");
+      }
+
+      function closeOffcanvas() {
+        document.getElementById("offcanvasBackdrop").classList.remove("show");
+        document.getElementById("couponOffcanvas").classList.remove("show");
+      }
+
+      async function handleCreate(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = {
+          code: formData.get("code").toUpperCase(),
+          type: formData.get("type"),
+          value: parseFloat(formData.get("value")),
+          usage_limit: parseInt(formData.get("usage_limit")) || 0,
+          min_purchase: parseFloat(formData.get("min_purchase")) || 0,
+          max_discount: parseFloat(formData.get("max_discount")) || 0,
+          expires_at: formData.get("expires_at"),
+        };
+
+        try {
+          const res = await fetch(`${API_BASE}/coupons`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            Swal.fire({
+              title: "Berhasil",
+              text: "Kupon berhasil dibuat",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: "top-end",
+            });
+            closeOffcanvas();
+            loadCoupons();
+          } else {
+            const err = await res.json();
+            Swal.fire("Gagal", err.error, "error");
+          }
+        } catch (err) {
+          Swal.fire("Error", "Failed to create coupon", "error");
+        }
+      }
+
+      async function deleteCoupon(id) {
+        const result = await Swal.fire({
+          title: "Hapus Kupon?",
+          text: "Kupon yang dihapus tidak dapat dikembalikan!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc2626",
+          cancelButtonColor: "#6b7280",
+          confirmButtonText: "Ya, Hapus!",
+          cancelButtonText: "Batal",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch(`${API_BASE}/coupons/${id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+              loadCoupons();
+              Swal.fire({
+                title: "Terhapus",
+                text: "Kupon berhasil dihapus",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+                toast: true,
+                position: "top-end",
+              });
+            } else {
+              Swal.fire("Error", "Gagal menghapus kupon", "error");
+            }
+          } catch (err) {
+            Swal.fire("Error", "Gagal menghapus kupon", "error");
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

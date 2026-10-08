@@ -1,0 +1,394 @@
+{
+  "name": "Amerygo",
+  "slug": "amerygo",
+  "description": "Premium Sportswear Theme with Dark Header and Orange Accents",
+  "version": "1.0.0",
+  "thumbnail_url": "/themes/amerygo/assets/img/thumbnail.jpg",
+  "allowed_user_ids": [],
+  "templates": {
+    "index": "home.html",
+    "product": "product.html"
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand Identity"
+    },
+    {
+      "id": "primary_color",
+      "type": "color",
+      "label": "Primary Color (Orange)",
+      "default": "#f75c03",
+      "scope": "global"
+    },
+    {
+      "id": "secondary_color",
+      "type": "color",
+      "label": "Secondary Color (Dark)",
+      "default": "#1a1a1a",
+      "scope": "global"
+    },
+    {
+      "id": "background_color",
+      "type": "color",
+      "label": "Background Color",
+      "default": "#ffffff",
+      "scope": "global"
+    },
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "id": "hero_title",
+      "type": "text",
+      "label": "Hero Title",
+      "default": "Wujudkan <span class='text-highlight'>Identitas Tim</span> dengan Jersey Premium",
+      "scope": "index"
+    },
+    {
+      "id": "hero_subtitle",
+      "type": "text",
+      "label": "Hero Subtitle",
+      "default": "Jasa custom jersey dan ready stock terbaik untuk futsal, sepak bola, esports, dan komunitas Anda.",
+      "scope": "index"
+    },
+    {
+      "id": "hero_image",
+      "type": "image",
+      "label": "Hero Image",
+      "default": "/themes/amerygo/assets/img/hero.jpg",
+      "scope": "index"
+    },
+    {
+      "type": "header",
+      "content": "Hero Buttons"
+    },
+    {
+      "id": "hero_btn_catalog_text",
+      "type": "text",
+      "label": "Teks Tombol Katalog",
+      "default": "Lihat Katalog",
+      "scope": "index"
+    },
+    {
+      "id": "hero_btn_consult_text",
+      "type": "text",
+      "label": "Teks Tombol Konsultasi",
+      "default": "Konsultasi",
+      "scope": "index"
+    },
+    {
+      "type": "header",
+      "content": "Catalog Section"
+    },
+    {
+      "id": "catalog_title",
+      "type": "text",
+      "label": "Judul Katalog",
+      "default": "Katalog <span class='text-orange'>Produk</span>",
+      "scope": "index"
+    },
+    {
+      "id": "catalog_subtitle",
+      "type": "text",
+      "label": "Sub-Judul Katalog",
+      "default": "Pilihan terbaik untuk Anda",
+      "scope": "index"
+    },
+    {
+      "id": "no_products_text",
+      "type": "text",
+      "label": "Teks Produk Kosong",
+      "default": "Belum ada produk",
+      "scope": "index"
+    },
+    {
+      "type": "header",
+      "content": "Product Detail"
+    },
+    {
+      "id": "back_home_text",
+      "type": "text",
+      "label": "Teks Kembali Home (Navbar)",
+      "default": "Kembali ke Home",
+      "scope": "product"
+    },
+    {
+      "id": "back_text",
+      "type": "text",
+      "label": "Teks Kembali",
+      "default": "Kembali",
+      "scope": "product"
+    },
+    {
+      "id": "order_now_text",
+      "type": "text",
+      "label": "Teks Tombol Pesan",
+      "default": "Pesan Sekarang",
+      "scope": "product"
+    },
+    {
+      "id": "whatsapp_template_text",
+      "type": "text",
+      "label": "Template Pesan WA",
+      "default": "Halo, saya tertarik dengan {{product.name}}",
+      "scope": "product"
+    },
+    {
+      "id": "whatsapp_btn_color",
+      "type": "color",
+      "label": "Warna Tombol WA",
+      "default": "#25D366",
+      "scope": "product"
+    },
+    {
+      "type": "header",
+      "content": "Why Choose Us (Features)"
+    },
+    {
+      "id": "features_title",
+      "type": "text",
+      "label": "Judul Section",
+      "default": "Keunggulan Kami",
+      "scope": "index"
+    },
+    {
+      "id": "features_list",
+      "type": "repeater",
+      "label": "Daftar Keunggulan",
+      "scope": "index",
+      "schema": [
+        {
+          "id": "icon",
+          "type": "icon",
+          "label": "Icon Class (FontAwesome)",
+          "default": "fas fa-check"
+        },
+        {
+          "id": "title",
+          "type": "text",
+          "label": "Judul",
+          "default": "Judul Fitur"
+        },
+        {
+          "id": "desc",
+          "type": "text",
+          "label": "Deskripsi",
+          "default": "Deskripsi singkat fitur."
+        }
+      ],
+      "default": [
+        {
+          "icon": "fas fa-tshirt",
+          "title": "Bahan Premium",
+          "desc": "Menggunakan bahan dryfit kualitas ekspor yang nyaman."
+        },
+        {
+          "icon": "fas fa-bolt",
+          "title": "Pengerjaan Cepat",
+          "desc": "Proses produksi on-time dengan quality control ketat."
+        },
+        {
+          "icon": "fas fa-palette",
+          "title": "Custom Desain",
+          "desc": "Bebas request desain sesuai identitas tim Anda."
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Paket Section"
+    },
+    {
+      "id": "packages_title",
+      "type": "text",
+      "label": "Judul Section Paket",
+      "default": "Paket <span class='text-orange'>Jersey</span>",
+      "scope": "index"
+    },
+    {
+      "id": "packages_subtitle",
+      "type": "text",
+      "label": "Sub-Judul Paket",
+      "default": "Pilih paket sesuai kebutuhan tim Anda",
+      "scope": "index"
+    },
+    {
+      "id": "packages_list",
+      "type": "repeater",
+      "label": "Daftar Paket",
+      "scope": "index",
+      "schema": [
+        {
+          "id": "name",
+          "type": "text",
+          "label": "Nama Paket",
+          "default": "Paket Basic"
+        },
+        {
+          "id": "price",
+          "type": "text",
+          "label": "Harga",
+          "default": "Rp 150.000"
+        },
+        {
+          "id": "feature1",
+          "type": "text",
+          "label": "Fitur 1",
+          "default": "Jersey 1 pcs"
+        },
+        {
+          "id": "feature2",
+          "type": "text",
+          "label": "Fitur 2",
+          "default": "Printing sublim"
+        },
+        {
+          "id": "feature3",
+          "type": "text",
+          "label": "Fitur 3",
+          "default": "Desain standar"
+        },
+        {
+          "id": "feature4",
+          "type": "text",
+          "label": "Fitur 4",
+          "default": ""
+        },
+        {
+          "id": "feature5",
+          "type": "text",
+          "label": "Fitur 5",
+          "default": ""
+        },
+        {
+          "id": "is_popular",
+          "type": "checkbox",
+          "label": "Tandai sebagai Popular",
+          "default": false
+        }
+      ],
+      "default": [
+        {
+          "name": "Paket Basic",
+          "price": "Rp 150.000",
+          "feature1": "Jersey 1 pcs",
+          "feature2": "Printing sublim",
+          "feature3": "Desain standar",
+          "feature4": "",
+          "feature5": "",
+          "is_popular": false
+        },
+        {
+          "name": "Paket Team",
+          "price": "Rp 1.500.000",
+          "feature1": "Jersey 12 pcs",
+          "feature2": "Printing premium",
+          "feature3": "Custom desain",
+          "feature4": "Nama & nomor punggung",
+          "feature5": "",
+          "is_popular": true
+        },
+        {
+          "name": "Paket Club",
+          "price": "Rp 3.000.000",
+          "feature1": "Jersey 25 pcs",
+          "feature2": "Printing premium",
+          "feature3": "Full custom desain",
+          "feature4": "Nama & nomor punggung",
+          "feature5": "Celana + kaos kaki",
+          "is_popular": false
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Testimoni Section"
+    },
+    {
+      "id": "testimonials_title",
+      "type": "text",
+      "label": "Judul Section Testimoni",
+      "default": "Apa Kata <span class='text-orange'>Mereka</span>?",
+      "scope": "index"
+    },
+    {
+      "id": "testimonials_subtitle",
+      "type": "text",
+      "label": "Sub-Judul Testimoni",
+      "default": "Testimoni dari pelanggan setia kami",
+      "scope": "index"
+    },
+    {
+      "id": "testimonials_list",
+      "type": "repeater",
+      "label": "Daftar Testimoni",
+      "scope": "index",
+      "schema": [
+        {
+          "id": "name",
+          "type": "text",
+          "label": "Nama",
+          "default": "John Doe"
+        },
+        {
+          "id": "role",
+          "type": "text",
+          "label": "Jabatan/Tim",
+          "default": "Captain, FC United"
+        },
+        {
+          "id": "quote",
+          "type": "textarea",
+          "label": "Testimoni",
+          "default": "Kualitas jersey sangat bagus dan nyaman dipakai saat bermain."
+        },
+        {
+          "id": "avatar",
+          "type": "image",
+          "label": "Foto",
+          "default": ""
+        }
+      ],
+      "default": [
+        {
+          "name": "Andi Pratama",
+          "role": "Captain, Garuda FC",
+          "quote": "Jersey berkualitas tinggi dengan desain yang sesuai keinginan tim. Pengerjaan cepat dan hasil memuaskan!",
+          "avatar": ""
+        },
+        {
+          "name": "Budi Santoso",
+          "role": "Manager, Storm Esports",
+          "quote": "Sudah 3x order di Amerygo, selalu puas dengan hasilnya. Recommended banget!",
+          "avatar": ""
+        },
+        {
+          "name": "Dewi Lestari",
+          "role": "Sekretaris, Futsal Wanita Jakarta",
+          "quote": "Bahan nyaman, printing awet, dan pelayanan ramah. Pasti order lagi!",
+          "avatar": ""
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "id": "footer_text",
+      "type": "text",
+      "label": "Footer Text",
+      "default": "Amerygo - Quality Jersey",
+      "scope": "global"
+    },
+    {
+      "id": "contact_us_text",
+      "type": "text",
+      "label": "Teks Hubungi Kami",
+      "default": "Hubungi Kami",
+      "scope": "global"
+    }
+  ]
+}

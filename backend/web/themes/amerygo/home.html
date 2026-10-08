@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{store.name}} - Katalog Produk</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/themes/amerygo/assets/css/style.css" />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+          --primary-color: {{primary_color}};
+          --secondary-color: {{secondary_color}};
+          --bg-color: {{background_color}};
+      }
+
+      body { background-color: var(--bg-color); }
+      .product-card { cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="container navbar-container">
+        <a href="/s/{{store.slug}}" class="logo">
+          <img
+            src="{{#if store.logo_url}}{{store.logo_url}}{{else}}/static/images/sello-logo-dark.webp{{/if}}"
+            alt="{{store.name}}"
+            style="height: 40px; object-fit: contain"
+          />
+        </a>
+        <button class="mobile-menu-btn" aria-label="Toggle Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <nav class="nav-links">
+          <a href="#home">Beranda</a>
+          <a href="#features">Keunggulan</a>
+          <a href="#catalog">Katalog</a>
+          <a href="#packages">Paket</a>
+          <a href="#testimonials">Testimoni</a>
+          <a href="#contact" class="btn btn-primary">Hubungi Kami</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="hero"
+      style="
+        background: #000;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+      "
+    >
+      <!-- Content Column (Left) -->
+      <div
+        class="hero-left"
+        style="
+          flex: 1;
+          min-width: 500px;
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px;
+        "
+      >
+        <div class="container" style="width: 100%; max-width: 600px; margin: 0">
+          <h1
+            class="hero-title"
+            style="
+              color: white;
+              font-size: 3.5rem;
+              line-height: 1.2;
+              margin-bottom: 24px;
+            "
+          >
+            {{{hero_title}}}
+          </h1>
+          <p
+            class="hero-subtitle"
+            style="
+              color: #ccc;
+              font-size: 1.1rem;
+              margin-bottom: 32px;
+              max-width: 480px;
+              line-height: 1.6;
+            "
+          >
+            {{hero_subtitle}}
+          </p>
+          <div class="hero-buttons">
+            <a
+              href="#catalog"
+              class="btn btn-primary"
+              style="margin-right: 12px; padding: 12px 30px"
+              >{{hero_btn_catalog_text}}</a
+            >
+            <a
+              href="https://wa.me/{{store.whatsapp}}"
+              target="_blank"
+              class="btn btn-outline"
+              style="border-color: white; color: white; padding: 12px 30px"
+              >{{hero_btn_consult_text}}</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Column (Right) -->
+      <div
+        class="hero-right"
+        style="flex: 1; min-width: 400px; position: relative; min-height: 500px"
+      >
+        <div
+          style="
+            position: absolute; 
+            top: 0; right: 0; bottom: 0; left: 0;
+            {{#if hero_image}}
+              background-image: url('{{hero_image}}');
+              background-size: cover;
+              background-position: center center;
+              background-repeat: no-repeat;
+            {{else}}
+              background-color: #222;
+              background-image: url('/themes/amerygo/assets/img/hero.jpg'); /* Fallback */
+              background-size: cover;
+              background-position: center;
+            {{/if}}
+         "
+        ></div>
+      </div>
+    </section>
+
+    <!-- Key Features (Why Choose Us) - Moved after Hero -->
+    <section id="features" class="section" style="background-color: #f8fafc">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2>{{{features_title}}}</h2>
+        </div>
+
+        <div
+          class="features-grid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+          "
+        >
+          {{#each features_list}}
+          <div
+            class="feature-card"
+            style="
+              background: white;
+              padding: 30px;
+              border-radius: 16px;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+              text-align: center;
+              transition: transform 0.3s ease;
+            "
+          >
+            <div
+              style="
+                width: 60px;
+                height: 60px;
+                background: rgba(247, 92, 3, 0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                color: var(--primary-color);
+                font-size: 24px;
+              "
+            >
+              <i class="{{this.icon}}"></i>
+            </div>
+            <h3 style="margin-bottom: 10px; font-size: 18px">{{this.title}}</h3>
+            <p style="color: #64748b; font-size: 14px; line-height: 1.6">
+              {{this.desc}}
+            </p>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Catalog -->
+    <section id="catalog" class="section">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2>{{{catalog_title}}}</h2>
+          <p>{{catalog_subtitle}}</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="catalog-filters">
+          <button class="filter-btn active" data-filter="all">Semua</button>
+          {{#each categories}}
+          <button class="filter-btn" data-filter="{{this.id}}">
+            {{this.name}}
+          </button>
+          {{/each}}
+        </div>
+
+        <!-- Products Grid -->
+        <div id="catalog-container" class="catalog-grid">
+          {{#each products}}
+          <div
+            class="product-card"
+            data-category="{{this.category_id}}"
+            onclick="window.location.href='{{product_link}}'"
+          >
+            <div class="product-image">
+              {{#if this.image_url}}
+              <img
+                src="{{this.image_url}}"
+                alt="{{this.name}}"
+                style="width: 100%; height: 100%; object-fit: cover"
+              />
+              {{else}}
+              <div class="placeholder-img">{{this.name}}</div>
+              {{/if}}
+            </div>
+            <div class="product-info">
+              <h3>{{this.name}}</h3>
+              <p
+                class="price"
+                style="color: var(--primary-color); font-weight: 700"
+              >
+                Rp {{this.price}}
+              </p>
+            </div>
+          </div>
+          {{else}}
+          <div
+            style="grid-column: 1/-1; text-align: center"
+            class="no-products"
+          >
+            <h3>{{no_products_text}}</h3>
+          </div>
+          {{/each}}
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            const buttons = document.querySelectorAll(".filter-btn");
+            const products = document.querySelectorAll(".product-card");
+
+            buttons.forEach((btn) => {
+              btn.addEventListener("click", () => {
+                // 1. Remove active class from all buttons
+                buttons.forEach((b) => b.classList.remove("active"));
+                // 2. Add active class to clicked button
+                btn.classList.add("active");
+
+                const filterValue = btn.getAttribute("data-filter");
+
+                products.forEach((product) => {
+                  if (filterValue === "all") {
+                    product.style.display = "block";
+                  } else {
+                    const productCat = product.getAttribute("data-category");
+                    if (productCat === filterValue) {
+                      product.style.display = "block";
+                    } else {
+                      product.style.display = "none";
+                    }
+                  }
+                });
+              });
+            });
+          });
+        </script>
+      </div>
+    </section>
+
+    <!-- Packages Section -->
+    <section
+      id="packages"
+      class="section"
+      style="background-color: #1a1a1a; color: white"
+    >
+      <div class="container">
+        <div class="section-header text-center">
+          <h2 style="color: white">{{{packages_title}}}</h2>
+          <p style="color: #ccc">{{packages_subtitle}}</p>
+        </div>
+
+        <div
+          class="packages-grid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+          "
+        >
+          {{#each packages_list}}
+          <div
+            class="package-card"
+            style="
+              background: #2a2a2a;
+              padding: 40px 30px;
+              border-radius: 20px;
+              text-align: center;
+              position: relative;
+              transition: transform 0.3s ease;
+            "
+          >
+            {{#if this.is_popular}}
+            <div
+              style="
+                position: absolute;
+                top: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--primary-color);
+                color: #fff;
+                padding: 6px 20px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+              "
+            >
+              Popular
+            </div>
+            {{/if}}
+            <h3 style="font-size: 20px; margin-bottom: 15px; color: #fff">
+              {{this.name}}
+            </h3>
+            <div
+              style="
+                font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 25px;
+                color: var(--primary-color);
+              "
+            >
+              {{this.price}}
+            </div>
+            <ul
+              style="
+                list-style: none;
+                padding: 0;
+                margin: 0 0 30px 0;
+                text-align: left;
+              "
+            >
+              {{#if this.feature1}}
+              <li
+                style="
+                  padding: 10px 0;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  color: rgba(255, 255, 255, 0.9);
+                  font-size: 14px;
+                "
+              >
+                <i
+                  class="fas fa-check"
+                  style="color: var(--primary-color); margin-right: 10px"
+                ></i>
+                {{this.feature1}}
+              </li>
+              {{/if}} {{#if this.feature2}}
+              <li
+                style="
+                  padding: 10px 0;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  color: rgba(255, 255, 255, 0.9);
+                  font-size: 14px;
+                "
+              >
+                <i
+                  class="fas fa-check"
+                  style="color: var(--primary-color); margin-right: 10px"
+                ></i>
+                {{this.feature2}}
+              </li>
+              {{/if}} {{#if this.feature3}}
+              <li
+                style="
+                  padding: 10px 0;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  color: rgba(255, 255, 255, 0.9);
+                  font-size: 14px;
+                "
+              >
+                <i
+                  class="fas fa-check"
+                  style="color: var(--primary-color); margin-right: 10px"
+                ></i>
+                {{this.feature3}}
+              </li>
+              {{/if}} {{#if this.feature4}}
+              <li
+                style="
+                  padding: 10px 0;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  color: rgba(255, 255, 255, 0.9);
+                  font-size: 14px;
+                "
+              >
+                <i
+                  class="fas fa-check"
+                  style="color: var(--primary-color); margin-right: 10px"
+                ></i>
+                {{this.feature4}}
+              </li>
+              {{/if}} {{#if this.feature5}}
+              <li
+                style="
+                  padding: 10px 0;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  color: rgba(255, 255, 255, 0.9);
+                  font-size: 14px;
+                "
+              >
+                <i
+                  class="fas fa-check"
+                  style="color: var(--primary-color); margin-right: 10px"
+                ></i>
+                {{this.feature5}}
+              </li>
+              {{/if}}
+            </ul>
+            <a
+              href="https://wa.me/{{store.whatsapp}}?text=Halo, saya tertarik dengan {{this.name}}"
+              target="_blank"
+              class="btn btn-primary"
+              style="width: 100%; padding: 14px"
+            >
+              Pilih Paket
+            </a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section
+      id="testimonials"
+      class="section"
+      style="background-color: #f8fafc"
+    >
+      <div class="container">
+        <div class="section-header text-center">
+          <h2>{{{testimonials_title}}}</h2>
+          <p>{{testimonials_subtitle}}</p>
+        </div>
+
+        <div
+          class="testimonials-grid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+          "
+        >
+          {{#each testimonials_list}}
+          <div
+            class="testimonial-card"
+            style="
+              background: white;
+              padding: 30px;
+              border-radius: 16px;
+              box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+              position: relative;
+            "
+          >
+            <div
+              style="
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 40px;
+                color: rgba(247, 92, 3, 0.15);
+              "
+            >
+              <i class="fas fa-quote-right"></i>
+            </div>
+            <p
+              style="
+                color: #475569;
+                font-size: 15px;
+                line-height: 1.7;
+                margin-bottom: 20px;
+                font-style: italic;
+              "
+            >
+              "{{this.quote}}"
+            </p>
+            <div style="display: flex; align-items: center; gap: 15px">
+              {{#if this.avatar}}
+              <div
+                style="
+                  width: 50px;
+                  height: 50px;
+                  border-radius: 50%;
+                  background: url('{{this.avatar}}') center/cover;
+                "
+              ></div>
+              {{else}}
+              <div
+                style="
+                  width: 50px;
+                  height: 50px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #f75c03, #ff8f00);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: 700;
+                  font-size: 18px;
+                "
+              >
+                <i class="fas fa-user"></i>
+              </div>
+              {{/if}}
+              <div>
+                <div style="font-weight: 600; color: #1e293b">
+                  {{this.name}}
+                </div>
+                <div style="font-size: 13px; color: #64748b">{{this.role}}</div>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <h3 class="logo">{{store.name}}</h3>
+            <p>
+              {{#if store.description}}{{store.description}}{{else}}Toko Online
+              Terpercaya{{/if}}
+            </p>
+          </div>
+          <div class="footer-contact">
+            <h4>{{contact_us_text}}</h4>
+            <p><i class="fab fa-whatsapp"></i> {{store.whatsapp}}</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>{{footer_text}}</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+      document
+        .querySelector(".mobile-menu-btn")
+        .addEventListener("click", function () {
+          document.querySelector(".nav-links").classList.toggle("active");
+        });
+
+      // Header scroll effect
+      window.addEventListener("scroll", function () {
+        const header = document.querySelector(".navbar");
+        if (window.scrollY > 50) {
+          header.style.backgroundColor = "rgba(26, 26, 26, 0.98)";
+          header.style.padding = "15px 0";
+        } else {
+          header.style.backgroundColor = "rgba(26, 26, 26, 0.95)";
+          header.style.padding = "20px 0";
+        }
+      });
+    </script>
+  </body>
+</html>

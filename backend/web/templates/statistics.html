@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistik — Sello</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      .stats-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 16px 32px;
+      }
+
+      .stats-header {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--border-light, #e5e7eb);
+        margin-bottom: 24px;
+      }
+
+      .stats-header h1 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .stats-header p {
+        font-size: 14px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .stat-card {
+        background: var(--card-bg, #fff);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        padding: 20px;
+      }
+
+      .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+
+      .stat-label {
+        font-size: 13px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary, #111827);
+        margin-bottom: 4px;
+      }
+
+      .stat-subtitle {
+        font-size: 12px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      /* Section Card */
+      .section-card {
+        background: var(--card-bg, #fff);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid var(--border-light, #f3f4f6);
+      }
+
+      .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary, #111827);
+      }
+
+      .section-subtitle {
+        font-size: 12px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      .section-body {
+        padding: 16px;
+      }
+
+      /* Product Stats Table */
+      .products-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .products-table th,
+      .products-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-light, #f3f4f6);
+        font-size: 13px;
+      }
+
+      .products-table th {
+        color: var(--text-muted, #6b7280);
+        font-weight: 500;
+        font-size: 12px;
+      }
+
+      .products-table td:last-child,
+      .products-table th:last-child {
+        text-align: right;
+      }
+
+      .product-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .product-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        background: #f3f4f6;
+        object-fit: cover;
+      }
+
+      .product-name {
+        font-weight: 500;
+        color: var(--text-primary, #111827);
+      }
+
+      /* Storage Bar */
+      .storage-bar {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+
+      .storage-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        border-radius: 4px;
+        transition: width 0.3s;
+      }
+
+      .storage-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 32px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      .empty-state i {
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+
+      @media (max-width: 600px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .products-table th:nth-child(2),
+        .products-table td:nth-child(2) {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+    <main class="main-content">
+      <div class="stats-container">
+        <header class="stats-header">
+          <h1>Statistik</h1>
+          <p>Pantau performa toko Anda</p>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="eye"></i></div>
+              <span class="stat-label">Total Kunjungan</span>
+            </div>
+            <div class="stat-value" id="visitCount">-</div>
+            <div class="stat-subtitle">Semua waktu</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="message-circle"></i></div>
+              <span class="stat-label">Klik WhatsApp</span>
+            </div>
+            <div class="stat-value" id="clickCount">-</div>
+            <div class="stat-subtitle">Calon pembeli</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="package"></i></div>
+              <span class="stat-label">Total Produk</span>
+            </div>
+            <div class="stat-value" id="productCount">-</div>
+            <div class="stat-subtitle">Produk aktif</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="hard-drive"></i></div>
+              <span class="stat-label">Penyimpanan</span>
+            </div>
+            <div class="stat-value" id="storageUsed">-</div>
+            <div class="stat-subtitle" id="storageMax">dari 50 MB</div>
+          </div>
+        </div>
+
+        <!-- Storage Detail -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon"><i data-lucide="database"></i></div>
+            <div>
+              <div class="section-title">Penggunaan Storage</div>
+              <div class="section-subtitle">Kapasitas gambar produk</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="storage-bar">
+              <div
+                class="storage-fill"
+                id="storageFill"
+                style="width: 0%"
+              ></div>
+            </div>
+            <div class="storage-text">
+              <span id="storagePercent">0% digunakan</span>
+              <span id="storageRemaining">50 MB tersedia</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-icon"><i data-lucide="trending-up"></i></div>
+            <div>
+              <div class="section-title">Produk Populer</div>
+              <div class="section-subtitle">Berdasarkan kunjungan</div>
+            </div>
+          </div>
+          <div class="section-body" id="topProductsBody">
+            <div class="empty-state">
+              <i
+                data-lucide="bar-chart-2"
+                style="width: 48px; height: 48px"
+              ></i>
+              <p>Belum ada data</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/admin-layout.js?v=2"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => lucide.createIcons());
+    </script>
+    <script>
+      let stores = [],
+        currentStore = null;
+
+      async function loadStatsPage() {
+        stores = (await apiRequest("/api/stores")) || [];
+        if (stores.length === 0) {
+          showToast("Buat toko dulu", "error");
+          setTimeout(() => (window.location.href = "/dashboard/stores"), 2000);
+          return;
+        }
+        const storeId = getCurrentStoreId();
+        currentStore = stores.find((s) => s.id === storeId) || stores[0];
+        loadStats();
+      }
+
+      async function loadStats() {
+        try {
+          const data = await apiRequest(`/api/stores/${currentStore.id}/stats`);
+          if (!data) return;
+
+          // Update stat cards
+          document.getElementById("visitCount").textContent = formatNumber(
+            data.visits || 0,
+          );
+          document.getElementById("clickCount").textContent = formatNumber(
+            data.clicks || 0,
+          );
+          document.getElementById("productCount").textContent = formatNumber(
+            data.products || 0,
+          );
+
+          // Storage
+          const usedMB = (data.storage_used || 0) / (1024 * 1024);
+          const maxMB = (data.storage_max || 50 * 1024 * 1024) / (1024 * 1024);
+          const percent = Math.min(100, (usedMB / maxMB) * 100);
+
+          document.getElementById("storageUsed").textContent =
+            usedMB.toFixed(1) + " MB";
+          document.getElementById("storageFill").style.width = percent + "%";
+          document.getElementById("storagePercent").textContent =
+            percent.toFixed(0) + "% digunakan";
+          document.getElementById("storageRemaining").textContent =
+            (maxMB - usedMB).toFixed(1) + " MB tersedia";
+
+          // Re-create icons after dynamic content
+          lucide.createIcons();
+        } catch (err) {
+          console.error("Failed to load stats:", err);
+        }
+      }
+
+      function formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+        if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+        return num.toString();
+      }
+
+      document.addEventListener("DOMContentLoaded", loadStatsPage);
+    </script>
+  </body>
+</html>

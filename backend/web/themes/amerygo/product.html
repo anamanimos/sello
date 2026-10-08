@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{product.name}} - {{store.name}}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/themes/amerygo/assets/css/style.css" />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+          --primary-color: {{primary_color}};
+          --secondary-color: {{secondary_color}};
+          --bg-color: {{background_color}};
+          --wa-btn-color: {{whatsapp_btn_color}};
+      }
+
+      body { background-color: var(--bg-color); font-family: 'Inter', sans-serif; }
+      .product-detail-section { padding: 40px 0; }
+      .product-gallery img { border-radius: 12px; width: 100%; object-fit: cover; aspect-ratio: 1; }
+      .product-title { font-family: 'Unbounded', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+      .product-price { font-size: 28px; font-weight: 700; color: var(--primary-color); margin-bottom: 20px; }
+      .back-link { display: inline-block; margin-bottom: 20px; color: #666; text-decoration: none; }
+      .back-link:hover { color: var(--primary-color); }
+      .btn-wa { background-color: var(--wa-btn-color); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: 16px; margin-top: 20px;}
+      .btn-wa:hover { opacity: 0.9; }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="container navbar-container">
+        <a href="/s/{{store.slug}}" class="logo">
+          <img
+            src="{{#if store.logo_url}}{{store.logo_url}}{{else}}/static/images/sello-logo-dark.webp{{/if}}"
+            alt="{{store.name}}"
+            style="height: 40px; object-fit: contain"
+          />
+        </a>
+        <div style="flex: 1"></div>
+        <a href="/s/{{store.slug}}" class="btn btn-outline btn-sm"
+          >{{back_home_text}}</a
+        >
+      </div>
+    </header>
+
+    <div class="container product-detail-section">
+      <a href="/s/{{store.slug}}" class="back-link"
+        ><i class="fas fa-arrow-left"></i> {{back_text}}</a
+      >
+
+      <div
+        class="product-grid"
+        style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px"
+      >
+        <!-- Gallery -->
+        <div class="product-gallery">
+          <img
+            src="{{product.image_url}}"
+            alt="{{product.name}}"
+            id="mainImage"
+          />
+          {{#if product.images}}
+          <div
+            style="display: flex; gap: 10px; margin-top: 10px; overflow-x: auto"
+          >
+            {{#each product.images}}
+            <img
+              src="{{this.url}}"
+              style="
+                width: 60px;
+                height: 60px;
+                cursor: pointer;
+                border: 2px solid transparent;
+              "
+              onclick="document.getElementById('mainImage').src='{{this.url}}'"
+              class="thumb"
+            />
+            {{/each}}
+          </div>
+          {{/if}}
+        </div>
+
+        <!-- Info -->
+        <div class="product-info">
+          <h1 class="product-title">{{product.name}}</h1>
+          <div class="product-price">Rp {{product.price}}</div>
+
+          {{#if product.original_price}}
+          <div
+            style="
+              text-decoration: line-through;
+              color: #999;
+              margin-bottom: 5px;
+            "
+          >
+            Rp {{product.original_price}}
+          </div>
+          {{/if}}
+
+          <div
+            class="product-description"
+            style="line-height: 1.6; color: #444; margin-bottom: 30px"
+          >
+            {{product.description}}
+          </div>
+
+          <a
+            href="https://wa.me/{{store.whatsapp}}?text={{whatsapp_template_text}}"
+            target="_blank"
+            class="btn-wa"
+          >
+            <i class="fab fa-whatsapp"></i> {{order_now_text}}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container text-center">
+        <p>{{footer_text}}</p>
+      </div>
+    </footer>
+
+    <style>
+      @media (max-width: 768px) {
+        .product-grid {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
+  </body>
+</html>

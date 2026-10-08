@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Langganan Saya — Sello</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+      .plan-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        transition: var(--transition);
+      }
+      .plan-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+      }
+      .plan-card.active {
+        border: 2px solid var(--accent);
+        background: var(--accent-light);
+      }
+      .plan-name {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .plan-price {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 24px;
+      }
+      .plan-price span {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .plan-features {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 32px;
+        flex: 1;
+      }
+      .plan-features li {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+      .feature-icon {
+        color: var(--success);
+      }
+      .current-plan-banner {
+        background: linear-gradient(135deg, var(--accent), #4f46e5);
+        color: white;
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal {
+        max-width: 500px;
+      }
+      .bank-details {
+        background: #f9fafb;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: monospace;
+        white-space: pre-line;
+        margin-bottom: 16px;
+        border: 1px dashed #d1d5db;
+      }
+
+      /* Step Wizard Styles */
+      .step-container {
+        display: none;
+      }
+      .step-container.active {
+        display: block;
+      }
+      .coupon-box {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .coupon-box input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+      }
+      .order-summary {
+        background: #f8fafc;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #64748b;
+      }
+      .summary-row.total {
+        border-top: 1px dashed #cbd5e1;
+        padding-top: 12px;
+        margin-top: 12px;
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 18px;
+      }
+      .payment-methods {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .payment-option {
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .payment-option.selected {
+        border-color: var(--accent);
+        background: var(--accent-light);
+      }
+      .payment-option.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: #f1f5f9;
+      }
+      /* Improved Modal Styles */
+      .modal {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .modal-header {
+        background: linear-gradient(135deg, var(--accent), #4f46e5);
+        padding: 24px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-header h2 {
+        color: white !important;
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+      }
+      .modal-header .btn-close {
+        color: rgba(255, 255, 255, 0.8) !important;
+        transition: color 0.2s;
+      }
+      .modal-header .btn-close:hover {
+        color: white !important;
+      }
+
+      .step-container {
+        padding: 24px;
+      }
+
+      .order-summary {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+      .summary-row {
+        font-size: 15px;
+        color: var(--text-secondary);
+      }
+      .summary-row.total {
+        font-size: 20px;
+        color: var(--text-primary);
+        border-top: 2px dashed #e2e8f0;
+        padding-top: 16px;
+        margin-top: 16px;
+      }
+
+      .coupon-box {
+        position: relative;
+        margin-top: 24px;
+        margin-bottom: 24px;
+      }
+      .coupon-box input {
+        width: 100%;
+        padding: 12px 14px;
+        padding-right: 100px; /* Space for button */
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+      .coupon-box input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      .coupon-box button {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+        bottom: 4px;
+        padding: 4px 16px;
+        background: var(--bg-secondary);
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .coupon-box button:hover {
+        background: #e2e8f0;
+      }
+
+      .payment-option {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+        transition: all 0.2s;
+      }
+      .payment-option:hover {
+        border-color: #cbd5e1;
+      }
+      .payment-option.selected {
+        border-color: var(--accent);
+        background: #eff6ff;
+        position: relative;
+      }
+      .payment-option.selected::after {
+        content: "✓";
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 20px;
+        height: 20px;
+        background: var(--accent);
+        color: white;
+        border-radius: 50%;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div class="header-left">
+          <h1>Billing & Subscription</h1>
+          <p>Kelola paket langganan toko Anda</p>
+        </div>
+      </header>
+
+      <div id="currentPlanSection"></div>
+
+      <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px">
+        Pilih Paket
+      </h2>
+      <div class="plans-grid" id="plansGrid">Loading plans...</div>
+
+      <!-- Unified Modal -->
+      <div class="modal-overlay" id="checkoutModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 id="checkoutTitle">Upgrade Plan</h2>
+            <button
+              class="btn-close"
+              onclick="closeCheckoutModal()"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                line-height: 1;
+                cursor: pointer;
+              "
+            >
+              &times;
+            </button>
+          </div>
+
+          <!-- Step 1: Review & Payment Method -->
+          <div id="step1" class="step-container">
+            <div class="order-summary">
+              <div class="summary-row">
+                <span>Paket Langganan</span>
+                <span id="summaryPlanName" style="font-weight: 500">-</span>
+              </div>
+              <div class="summary-row" style="margin-top: 8px">
+                <span>Harga Paket</span>
+                <span id="summaryPrice" style="font-weight: 500">-</span>
+              </div>
+              <div
+                class="summary-row"
+                id="discountRow"
+                style="display: none; color: #16a34a; margin-top: 8px"
+              >
+                <span>Diskon Kupon</span>
+                <span id="summaryDiscount" style="font-weight: 600">-Rp 0</span>
+              </div>
+              <div class="summary-row total">
+                <span>Total Tagihan</span>
+                <span id="summaryTotal">-</span>
+              </div>
+            </div>
+
+            <div class="coupon-box">
+              <input
+                type="text"
+                id="couponInput"
+                placeholder="Punya kode promo? Masukkan disini..."
+              />
+              <button type="button" onclick="applyCoupon()">Gunakan</button>
+            </div>
+
+            <div
+              style="
+                margin-bottom: 12px;
+                font-weight: 600;
+                color: var(--text-primary);
+              "
+            >
+              Pilih Metode Pembayaran
+            </div>
+            <div class="payment-methods">
+              <div
+                class="payment-option selected"
+                onclick="selectPaymentMethod('bank_transfer')"
+              >
+                <span
+                  style="
+                    font-size: 24px;
+                    background: white;
+                    padding: 8px;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                  "
+                  >🏦</span
+                >
+                <div>
+                  <div style="font-weight: 600; color: var(--text-primary)">
+                    Bank Transfer
+                  </div>
+                  <div style="font-size: 13px; color: var(--text-secondary)">
+                    Verifikasi Manual (Cek Otomatis)
+                  </div>
+                </div>
+              </div>
+              <div
+                class="payment-option disabled"
+                style="opacity: 0.5; background: #f8fafc"
+              >
+                <span
+                  style="
+                    font-size: 24px;
+                    background: white;
+                    padding: 8px;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                  "
+                  >⚡</span
+                >
+                <div>
+                  <div style="font-weight: 600; color: var(--text-primary)">
+                    QRIS
+                  </div>
+                  <div style="font-size: 13px; color: var(--text-secondary)">
+                    Otomatis & Instan (Segera Hadir)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="btn btn-primary"
+              style="
+                width: 100%;
+                padding: 14px;
+                font-size: 16px;
+                font-weight: 600;
+                margin-top: 8px;
+              "
+              onclick="processCheckout()"
+            >
+              Lanjut ke Pembayaran
+            </button>
+          </div>
+
+          <!-- Step 2: Payment & Proof -->
+          <div id="step2" class="step-container">
+            <div style="text-align: center; margin-bottom: 24px">
+              <div
+                style="
+                  width: 48px;
+                  height: 48px;
+                  background: #dbeafe;
+                  color: #2563eb;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin: 0 auto 16px;
+                "
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <h3 style="margin: 0 0 8px; font-size: 18px">Pesanan Dibuat!</h3>
+              <p
+                style="color: var(--text-secondary); font-size: 14px; margin: 0"
+              >
+                Silakan selesaikan pembayaran Anda.
+              </p>
+            </div>
+
+            <div class="bank-details" id="bankDetailsBox">Loading...</div>
+
+            <div
+              class="alert"
+              style="
+                background: #f0fdf4;
+                color: #166534;
+                padding: 16px;
+                border-radius: 8px;
+                margin-bottom: 24px;
+                font-size: 15px;
+                text-align: center;
+                border: 1px solid #bbf7d0;
+              "
+            >
+              Jumlah Transfer:
+              <strong
+                id="finalAmountDisplay"
+                style="display: block; font-size: 24px; margin-top: 4px"
+              ></strong>
+            </div>
+
+            <form id="uploadProofForm">
+              <input type="hidden" id="transactionId" />
+              <div class="form-group">
+                <label style="font-weight: 500">Upload Bukti Transfer</label>
+                <div
+                  style="
+                    margin-top: 8px;
+                    border: 2px dashed #e2e8f0;
+                    border-radius: 8px;
+                    padding: 20px;
+                    text-align: center;
+                    cursor: pointer;
+                    background: #f8fafc;
+                    transition: all 0.2s;
+                  "
+                  onclick="document.getElementById('proofFile').click()"
+                >
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#94a3b8"
+                    stroke-width="2"
+                    style="margin-bottom: 8px"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <div style="font-size: 14px; color: #64748b">
+                    Klik untuk pilih file gambar
+                  </div>
+                  <input
+                    type="file"
+                    id="proofFile"
+                    accept="image/*"
+                    required
+                    style="display: none"
+                    onchange="
+                      this.previousElementSibling.textContent =
+                        this.files[0].name
+                    "
+                  />
+                </div>
+              </div>
+              <div
+                class="modal-actions"
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 12px;
+                  margin-top: 24px;
+                "
+              >
+                <button
+                  type="button"
+                  class="btn btn-outline"
+                  onclick="closeCheckoutModal()"
+                  style="justify-content: center"
+                >
+                  Nanti Saja
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  style="justify-content: center"
+                >
+                  Kirim Bukti
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/admin-layout.js"></script>
+    <script>
+      let currentPlanId = null;
+      let bankDetails = "";
+      let selectedPlan = null;
+      let appliedCoupon = null;
+      let selectedPaymentMethod = "bank_transfer";
+
+      async function init() {
+        const user = await apiRequest("/api/auth/me");
+        if (user) {
+          renderCurrentPlan(user);
+          currentPlanId = user.plan_id;
+        }
+
+        const bankRes = await apiRequest("/api/billing/bank");
+        if (bankRes)
+          bankDetails =
+            bankRes.bank_details || "No payment instructions available.";
+
+        const plans = await apiRequest("/api/plans");
+        if (plans) renderPlans(plans, user ? user.plan_id : null);
+      }
+
+      function renderCurrentPlan(user) {
+        const planName = user.plan ? user.plan.name : "Free";
+        const expiry = user.subscription_ends_at
+          ? new Date(user.subscription_ends_at).toLocaleDateString()
+          : "Selamanya";
+        const html = `
+            <div class="current-plan-banner">
+                <div>
+                    <h2 style="font-size:24px; margin-bottom:4px; color:white;">${planName} Plan</h2>
+                    <p style="opacity:0.9">Berlaku sampai: ${expiry}</p>
+                </div>
+                <div><div style="font-weight:600; font-size:14px; background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:20px; backdrop-filter:blur(4px);">Active</div></div>
+            </div>`;
+        document.getElementById("currentPlanSection").innerHTML = html;
+      }
+
+      function renderPlans(plans, activePlanId) {
+        const grid = document.getElementById("plansGrid");
+        grid.innerHTML = plans
+          .map((p) => {
+            let isActive = false;
+            if (activePlanId) isActive = p.id == activePlanId;
+            else if (p.price_monthly === 0) isActive = true;
+
+            const isFree = p.price_monthly === 0;
+            const btnText = isActive
+              ? "Paket Saat Ini"
+              : isFree
+                ? "Switch to Free"
+                : "Pilih Paket";
+            const btnClass = isActive ? "btn-secondary" : "btn-primary";
+            const disabledAttr = isActive ? "disabled" : "";
+
+            return `
+                <div class="plan-card ${isActive ? "active" : ""}">
+                    <div class="plan-name">${p.name}</div>
+                    <div class="plan-price">Rp ${p.price_monthly.toLocaleString()} <span>/bulan</span></div>
+                    <ul class="plan-features">
+                        <li><span class="feature-icon">✓</span> ${p.max_stores} Toko</li>
+                        <li><span class="feature-icon">✓</span> ${p.max_products_per_store} Produk per Toko</li>
+                        <li><span class="feature-icon">✓</span> ${p.access_premium_themes ? "Premium Themes" : "Free Themes"}</li>
+                        <li><span class="feature-icon">✓</span> ${p.allow_custom_domain ? "Custom Domain" : "No Custom Domain"}</li>
+                        <li><span class="feature-icon">✓</span> ${p.remove_branding ? "No Sello Branding" : "Sello Branding"}</li>
+                    </ul>
+                    <div style="margin-top: auto;">
+                        <button class="btn ${btnClass}" style="width:100%; justify-content:center;" ${disabledAttr} onclick='openCheckout(${JSON.stringify(p)}, 1)'>${btnText}</button>
+                        ${!isFree && !isActive ? `<div style="text-align:center; margin-top:12px;"><small style="cursor:pointer; color:var(--text-muted); text-decoration:underline;" onclick='openCheckout(${JSON.stringify(p)}, 12)'>Bayar Setahun (Hemat 2 Bulan)</small></div>` : ""}
+                    </div>
+                </div>`;
+          })
+          .join("");
+      }
+
+      // --- Checkout Logic ---
+
+      window.openCheckout = (plan, duration) => {
+        selectedPlan = { ...plan, duration };
+        appliedCoupon = null;
+
+        // Reset UI
+        document.getElementById("checkoutTitle").textContent =
+          "Upgrade ke " + plan.name;
+        document.getElementById("step1").classList.add("active");
+        document.getElementById("step2").classList.remove("active");
+        document.getElementById("couponInput").value = "";
+        document.getElementById("discountRow").style.display = "none";
+
+        updateSummary();
+        document.getElementById("checkoutModal").classList.add("show");
+      };
+
+      window.closeCheckoutModal = () => {
+        document.getElementById("checkoutModal").classList.remove("show");
+      };
+
+      function updateSummary() {
+        if (!selectedPlan) return;
+
+        let basePrice = selectedPlan.price_monthly * selectedPlan.duration;
+        if (selectedPlan.duration >= 12 && selectedPlan.price_yearly > 0)
+          basePrice = selectedPlan.price_yearly;
+        else if (selectedPlan.duration >= 12)
+          basePrice = selectedPlan.price_monthly * 12;
+
+        let discount = 0;
+        if (appliedCoupon) {
+          if (appliedCoupon.type === "percentage") {
+            discount = basePrice * (appliedCoupon.value / 100);
+            if (
+              appliedCoupon.max_discount > 0 &&
+              discount > appliedCoupon.max_discount
+            )
+              discount = appliedCoupon.max_discount;
+          } else {
+            discount = appliedCoupon.value;
+          }
+        }
+
+        let total = basePrice - discount;
+        if (total < 0) total = 0;
+
+        document.getElementById("summaryPlanName").textContent =
+          `${selectedPlan.name} (${selectedPlan.duration} Bulan)`;
+        document.getElementById("summaryPrice").textContent =
+          "Rp " + basePrice.toLocaleString();
+
+        if (discount > 0) {
+          document.getElementById("summaryDiscount").textContent =
+            "-Rp " + discount.toLocaleString();
+          document.getElementById("discountRow").style.display = "flex";
+        } else {
+          document.getElementById("discountRow").style.display = "none";
+        }
+
+        document.getElementById("summaryTotal").textContent =
+          "Rp " + total.toLocaleString();
+      }
+
+      window.applyCoupon = async () => {
+        const code = document.getElementById("couponInput").value;
+        if (!code) return;
+
+        // Show loading state on button
+        const btn = document.querySelector("#couponInput + button");
+        const originalText = btn.textContent;
+        btn.textContent = "...";
+        btn.disabled = true;
+
+        try {
+          const res = await fetch("/api/billing/coupon/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("sello_token")}`,
+            },
+            body: JSON.stringify({ code }),
+          });
+
+          if (res.ok) {
+            const coupon = await res.json();
+            appliedCoupon = coupon;
+            updateSummary();
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              icon: "success",
+              title: "Kupon Berhasil Dipasang!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          } else {
+            const err = await res.json();
+            appliedCoupon = null;
+            updateSummary();
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              icon: "error",
+              title: err.error || "Kupon Tidak Valid",
+              showConfirmButton: false,
+              timer: 2000,
+            });
+          }
+        } catch (e) {
+          console.error(e);
+          Swal.fire(
+            "Error",
+            "Gagal memverifikasi kupon: " + e.message,
+            "error",
+          );
+        } finally {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      };
+
+      window.processCheckout = async () => {
+        Swal.fire({ title: "Memproses...", didOpen: () => Swal.showLoading() });
+
+        const payload = {
+          plan_id: selectedPlan.id,
+          duration: selectedPlan.duration,
+          payment_method: selectedPaymentMethod,
+          coupon_code: appliedCoupon ? appliedCoupon.code : "",
+        };
+
+        try {
+          // Use apiRequest wrapper if possible, or fetch
+          const res = await apiRequest("/api/billing/subscribe", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+
+          if (res && res.id) {
+            Swal.close();
+            // Move to Step 2
+            document.getElementById("step1").classList.remove("active");
+            document.getElementById("step2").classList.add("active");
+
+            document.getElementById("transactionId").value = res.id;
+            document.getElementById("finalAmountDisplay").textContent =
+              "Rp " + res.amount.toLocaleString();
+            document.getElementById("bankDetailsBox").textContent = bankDetails;
+          } else {
+            if (res.error) Swal.fire("Gagal", res.error, "error");
+          }
+        } catch (e) {
+          console.error(e);
+          Swal.fire("Error", "Terjadi kesalahan sistem", "error");
+        }
+      };
+
+      document
+        .getElementById("uploadProofForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const id = document.getElementById("transactionId").value;
+          const file = document.getElementById("proofFile").files[0];
+          if (!file) return;
+
+          const formData = new FormData();
+          formData.append("proof", file);
+
+          Swal.fire({
+            title: "Mengupload...",
+            didOpen: () => Swal.showLoading(),
+          });
+          try {
+            const res = await fetch(`/api/billing/${id}/proof`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("sello_token")}`,
+              },
+              body: formData,
+            });
+
+            if (res.ok) {
+              Swal.fire(
+                "Berhasil",
+                "Bukti pembayaran terkirim. Admin akan memverifikasi segera.",
+                "success",
+              ).then(() => window.location.reload());
+            } else {
+              const err = await res.json();
+              showToast(err.error || "Upload gagal", "error");
+            }
+          } catch (e) {
+            showToast("Error uploading file", "error");
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+    <script src="/static/js/admin-layout.js?v=3"></script>
+  </body>
+</html>

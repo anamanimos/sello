@@ -1,0 +1,1314 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pengaturan — Sello</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      /* Clean Minimalist Settings Styles */
+      .settings-container {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 0 16px 32px;
+      }
+
+      .settings-header {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--border-light, #e5e7eb);
+        margin-bottom: 24px;
+      }
+
+      .settings-header h1 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .settings-header p {
+        font-size: 14px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      /* Section Card */
+      .section-card {
+        background: var(--card-bg, #fff);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid var(--border-light, #f3f4f6);
+      }
+
+      .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        color: #6b7280;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+        background: #f3f4f6;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary, #111827);
+      }
+
+      .section-subtitle {
+        font-size: 12px;
+        color: var(--text-muted, #6b7280);
+      }
+
+      .section-body {
+        padding: 16px;
+      }
+
+      /* Form Styles */
+      .form-row {
+        margin-bottom: 16px;
+      }
+
+      .form-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary, #374151);
+        margin-bottom: 6px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid var(--border-color, #d1d5db);
+        border-radius: 8px;
+        background: var(--bg, #fff);
+        color: var(--text-primary, #111827);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      textarea.form-input {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      /* Logo Upload */
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo-preview {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: var(--bg-secondary, #f9fafb);
+        border: 2px dashed var(--border-color, #d1d5db);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .logo-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .logo-actions {
+        flex: 1;
+      }
+
+      .logo-actions p {
+        font-size: 12px;
+        color: var(--text-muted, #6b7280);
+        margin-top: 4px;
+      }
+
+      /* URL Display */
+      .url-display {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-secondary, #f9fafb);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+
+      .url-text {
+        flex: 1;
+        font-size: 13px;
+        font-family: "SF Mono", Monaco, monospace;
+        color: var(--primary, #3b82f6);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .url-actions {
+        display: flex;
+        gap: 4px;
+      }
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color, #e5e7eb);
+        background: var(--bg, #fff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.15s;
+      }
+
+      .icon-btn:hover {
+        background: var(--bg-secondary, #f9fafb);
+        border-color: var(--border-dark, #d1d5db);
+      }
+
+      /* Color Picker */
+      .color-row {
+        display: flex;
+        gap: 24px;
+      }
+
+      .color-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .color-picker {
+        width: 40px;
+        height: 40px;
+        padding: 2px;
+        border: 1px solid var(--border-color, #d1d5db);
+        border-radius: 8px;
+        cursor: pointer;
+        background: transparent;
+      }
+
+      .color-name {
+        font-size: 13px;
+        color: var(--text-secondary, #374151);
+      }
+
+      /* Domain Status */
+      .domain-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+
+      .domain-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .domain-status.verified {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      /* Edit Form */
+      .edit-form {
+        display: none;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-light, #f3f4f6);
+        margin-top: 12px;
+      }
+
+      .edit-form.active {
+        display: block;
+      }
+
+      .inline-form {
+        display: flex;
+        gap: 8px;
+      }
+
+      .inline-form .form-input {
+        flex: 1;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-primary {
+        background: var(--primary, #3b82f6);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #2563eb;
+      }
+
+      .btn-secondary {
+        background: var(--bg-secondary, #f3f4f6);
+        color: var(--text-primary, #374151);
+        border: 1px solid var(--border-color, #e5e7eb);
+      }
+
+      .btn-secondary:hover {
+        background: #e5e7eb;
+      }
+
+      .btn-sm {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-light, #f3f4f6);
+        margin-top: 16px;
+      }
+
+      /* Link Style */
+      .text-link {
+        font-size: 13px;
+        color: var(--primary, #3b82f6);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .text-link:hover {
+        text-decoration: underline;
+      }
+
+      /* DNS Instructions */
+      .dns-card {
+        background: var(--bg-secondary, #f9fafb);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .dns-row {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        font-family: "SF Mono", Monaco, monospace;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-light, #e5e7eb);
+      }
+
+      .dns-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .dns-label {
+        color: var(--text-muted, #6b7280);
+        width: 60px;
+        flex-shrink: 0;
+      }
+
+      .dns-value {
+        color: var(--text-primary, #111827);
+        font-weight: 500;
+      }
+
+      /* Hidden */
+      .hidden {
+        display: none !important;
+      }
+
+      /* Switch Toggle */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e5e7eb;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--primary, #3b82f6);
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+      input:disabled + .slider {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      @media (max-width: 480px) {
+        .color-row {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .inline-form {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+    <main class="main-content">
+      <div class="settings-container">
+        <header class="settings-header">
+          <h1>Pengaturan</h1>
+          <p>Kelola informasi dan tampilan toko Anda</p>
+        </header>
+
+        <form id="settingsForm">
+          <!-- Store Info -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-icon"><i data-lucide="store"></i></div>
+              <div>
+                <div class="section-title">Informasi Toko</div>
+                <div class="section-subtitle">Nama, deskripsi, dan kontak</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="form-row">
+                <label class="form-label">Nama Toko</label>
+                <input
+                  type="text"
+                  id="storeName"
+                  class="form-input"
+                  placeholder="Nama toko Anda"
+                />
+              </div>
+              <div class="form-row">
+                <label class="form-label">Deskripsi</label>
+                <textarea
+                  id="storeDesc"
+                  class="form-input"
+                  rows="3"
+                  placeholder="Ceritakan tentang toko Anda..."
+                ></textarea>
+              </div>
+              <div class="form-row">
+                <label class="form-label">WhatsApp</label>
+                <input
+                  type="tel"
+                  id="storeWa"
+                  class="form-input"
+                  placeholder="628123456789"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Logo -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-icon"><i data-lucide="image"></i></div>
+              <div>
+                <div class="section-title">Logo Toko</div>
+                <div class="section-subtitle">Gambar identitas toko</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="logo-row">
+                <div class="logo-preview" id="logoPreview">📷</div>
+                <div class="logo-actions">
+                  <input
+                    type="file"
+                    id="logoInput"
+                    accept="image/*"
+                    hidden
+                    onchange="uploadLogo()"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    onclick="document.getElementById('logoInput').click()"
+                  >
+                    Pilih Gambar
+                  </button>
+                  <p>JPG, PNG max 1MB</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Favicon -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-icon"><i data-lucide="smile"></i></div>
+              <div>
+                <div class="section-title">Favicon Toko</div>
+                <div class="section-subtitle">Ikon kecil di tab browser</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="logo-row">
+                <div class="logo-preview" id="faviconPreview">😄</div>
+                <div class="logo-actions">
+                  <input
+                    type="file"
+                    id="faviconInput"
+                    accept="image/x-icon,image/png,image/webp"
+                    hidden
+                    onchange="uploadFavicon()"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    onclick="document.getElementById('faviconInput').click()"
+                  >
+                    Pilih Favicon
+                  </button>
+                  <p>ICO, PNG, WEBP max 100KB</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Branding -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-icon"><i data-lucide="award"></i></div>
+              <div>
+                <div class="section-title">Sello Branding</div>
+                <div class="section-subtitle">
+                  Tampilkan atau sembunyikan logo Sello
+                </div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div
+                class="form-row"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <div>
+                  <label class="form-label" style="margin-bottom: 0"
+                    >Sembunyikan Branding</label
+                  >
+                  <p
+                    style="
+                      font-size: 12px;
+                      color: var(--text-muted);
+                      margin-top: 2px;
+                    "
+                  >
+                    Menghilangkan badge "Dibuat dengan Sello" di toko Anda.
+                  </p>
+                </div>
+                <div class="toggle-wrapper">
+                  <label class="switch">
+                    <input type="checkbox" id="hideBrandingToggle" />
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </div>
+              <div
+                id="brandingUpgradeMsg"
+                class="hidden"
+                style="
+                  margin-top: 12px;
+                  padding: 10px;
+                  background: #f3f4f6;
+                  border-radius: 8px;
+                  font-size: 12px;
+                  color: #4b5563;
+                "
+              >
+                Fitur ini memerlukan paket yang lebih tinggi (Business).
+                <a href="/dashboard/billing" class="text-link"
+                  >Upgrade sekarang</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="save" style="width: 16px; height: 16px"></i>
+              Simpan Perubahan
+            </button>
+          </div>
+        </form>
+
+        <!-- Store URLs -->
+        <div class="section-card" style="margin-top: 24px">
+          <div class="section-header">
+            <div class="section-icon"><i data-lucide="link"></i></div>
+            <div>
+              <div class="section-title">Alamat Toko</div>
+              <div class="section-subtitle">Subdomain dan custom domain</div>
+            </div>
+          </div>
+          <div class="section-body">
+            <!-- Subdomain -->
+            <div class="form-row">
+              <label class="form-label">Subdomain (Gratis)</label>
+              <div class="url-display">
+                <span class="url-text" id="subdomainUrl">-</span>
+                <div class="url-actions">
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    onclick="copySubdomain()"
+                    title="Copy"
+                  >
+                    <i data-lucide="copy" style="width: 14px; height: 14px"></i>
+                  </button>
+                  <a
+                    id="subdomainLink"
+                    href="#"
+                    target="_blank"
+                    class="icon-btn"
+                    title="Buka"
+                    ><i
+                      data-lucide="external-link"
+                      style="width: 14px; height: 14px"
+                    ></i
+                  ></a>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    onclick="editSubdomain()"
+                    title="Edit"
+                  >
+                    <i
+                      data-lucide="pencil"
+                      style="width: 14px; height: 14px"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Subdomain Edit Form -->
+              <div class="edit-form" id="subdomainEditForm">
+                <div class="inline-form">
+                  <input
+                    type="text"
+                    id="newSubdomainInput"
+                    class="form-input"
+                    placeholder="nama-toko"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    onclick="saveSubdomain()"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    onclick="cancelEditSubdomain()"
+                  >
+                    Batal
+                  </button>
+                </div>
+                <p
+                  style="
+                    font-size: 11px;
+                    color: var(--text-muted);
+                    margin-top: 6px;
+                  "
+                >
+                  .sello.id • huruf kecil, angka, strip
+                </p>
+              </div>
+            </div>
+
+            <!-- Custom Domain -->
+            <div
+              class="form-row"
+              style="
+                margin-top: 20px;
+                padding-top: 16px;
+                border-top: 1px solid var(--border-light, #f3f4f6);
+              "
+            >
+              <label class="form-label">Custom Domain</label>
+
+              <div id="domainStatus"></div>
+
+              <!-- No Domain -->
+              <div id="domainForm" class="hidden">
+                <div class="inline-form">
+                  <input
+                    type="text"
+                    id="customDomainInput"
+                    class="form-input"
+                    placeholder="www.tokosaya.com"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    onclick="setCustomDomain()"
+                  >
+                    Hubungkan
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pending Verification -->
+              <div id="domainVerify" class="hidden">
+                <div class="domain-status pending">
+                  <i data-lucide="clock" style="width: 14px; height: 14px"></i>
+                  Menunggu verifikasi: <strong id="pendingDomain">-</strong>
+                </div>
+                <div class="dns-card">
+                  <div class="dns-row">
+                    <span class="dns-label">CNAME</span>
+                    <span class="dns-value">www → stores.sello.id</span>
+                  </div>
+                  <div class="dns-row">
+                    <span class="dns-label">TXT</span>
+                    <span class="dns-value"
+                      >_sello → <span id="verifyTokenDisplay">-</span></span
+                    >
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px">
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-sm"
+                    onclick="verifyDomain()"
+                  >
+                    <i
+                      data-lucide="check"
+                      style="width: 14px; height: 14px"
+                    ></i>
+                    Verifikasi
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    onclick="removeDomain()"
+                  >
+                    Batalkan
+                  </button>
+                </div>
+              </div>
+
+              <!-- Domain Verified -->
+              <div id="domainVerified" class="hidden">
+                <div class="domain-status verified">
+                  <i
+                    data-lucide="check-circle"
+                    style="width: 14px; height: 14px"
+                  ></i>
+                  Aktif:
+                  <a
+                    id="verifiedDomainLink"
+                    href="#"
+                    target="_blank"
+                    style="color: inherit; font-weight: 600"
+                  ></a>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-secondary btn-sm"
+                  onclick="removeDomain()"
+                >
+                  Hapus Domain
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/admin-layout.js?v=2"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => lucide.createIcons());
+    </script>
+    <script>
+      let stores = [],
+        currentStore = null,
+        currentUser = null;
+
+      async function loadSettingsPage() {
+        // Fetch User Info first
+        try {
+          const meRes = await apiRequest("/api/auth/me");
+          if (meRes && meRes.user) {
+            currentUser = meRes.user;
+          }
+        } catch (e) {
+          console.error("Failed to fetch user info", e);
+        }
+
+        stores = (await apiRequest("/api/stores")) || [];
+        if (stores.length === 0) {
+          showToast("Buat toko dulu", "error");
+          setTimeout(() => (window.location.href = "/dashboard/stores"), 2000);
+          return;
+        }
+        const storeId = getCurrentStoreId();
+        currentStore = stores.find((s) => s.id === storeId) || stores[0];
+        loadSettings();
+      }
+
+      function loadSettings() {
+        document.getElementById("storeName").value = currentStore.name || "";
+        document.getElementById("storeDesc").value =
+          currentStore.description || "";
+        document.getElementById("storeWa").value = currentStore.whatsapp || "";
+
+        if (currentStore.logo_url) {
+          document.getElementById("logoPreview").innerHTML =
+            `<img src="${currentStore.logo_url}">`;
+        }
+        if (currentStore.favicon_url) {
+          document.getElementById("faviconPreview").innerHTML =
+            `<img src="${currentStore.favicon_url}">`;
+        }
+
+        // Branding Switcher Logic
+        const brandingToggle = document.getElementById("hideBrandingToggle");
+        const upgradeMsg = document.getElementById("brandingUpgradeMsg");
+
+        // 1. Check capability
+        const canRemoveBranding =
+          currentUser && currentUser.Plan && currentUser.Plan.remove_branding;
+
+        if (canRemoveBranding) {
+          brandingToggle.disabled = false;
+          upgradeMsg.classList.add("hidden");
+          // Set state
+          brandingToggle.checked = currentStore.hide_branding || false;
+        } else {
+          brandingToggle.disabled = true;
+          brandingToggle.checked = false; // Always show branding if not allowed
+          upgradeMsg.classList.remove("hidden");
+        }
+
+        loadDomainInfo();
+      }
+
+      function updatePreview() {
+        // Colors saved locally
+      }
+
+      // Domain Management
+      async function loadDomainInfo() {
+        // Subdomain
+        const subdomainDisplay = document.getElementById("subdomainUrl");
+        const subdomainLink = document.getElementById("subdomainLink");
+        const fullSubdomain = currentStore.slug + ".sello.id"; // Using .sello.id for now, usually from config
+
+        subdomainDisplay.textContent = fullSubdomain;
+        subdomainLink.href = location.protocol + "//" + fullSubdomain; // Assuming wildcard or localhost handling
+        // Note: On localhost it might be /s/slug
+        if (location.hostname === "localhost") {
+          subdomainLink.href = "/s/" + currentStore.slug;
+          subdomainDisplay.textContent =
+            location.host + "/s/" + currentStore.slug;
+        }
+
+        // Custom Domain
+        const domainStatusDiv = document.getElementById("domainStatus");
+        const domainForm = document.getElementById("domainForm");
+        const domainVerify = document.getElementById("domainVerify");
+        const domainVerified = document.getElementById("domainVerified");
+
+        // Reset
+        domainForm.classList.add("hidden");
+        domainVerify.classList.add("hidden");
+        domainVerified.classList.add("hidden");
+        domainStatusDiv.innerHTML = "";
+
+        try {
+          const res = await apiRequest(`/api/stores/${currentStore.id}/domain`);
+          // res: { configured: bool, domain: string, verified: bool, verify_token: string }
+
+          if (!res.configured) {
+            domainForm.classList.remove("hidden");
+          } else if (!res.verified) {
+            domainVerify.classList.remove("hidden");
+            document.getElementById("customDomainInput").value = res.domain;
+            document.getElementById("pendingDomain").textContent = res.domain;
+            document.getElementById("verifyTokenDisplay").textContent =
+              res.verify_token;
+          } else {
+            domainVerified.classList.remove("hidden");
+            document.getElementById("verifiedDomainLink").textContent =
+              res.domain;
+            document.getElementById("verifiedDomainLink").href =
+              "https://" + res.domain;
+          }
+        } catch (e) {
+          console.error("Domain info error", e);
+          domainForm.classList.remove("hidden"); // Fallback
+        }
+      }
+
+      function copySubdomain() {
+        const text = document.getElementById("subdomainUrl").textContent;
+        navigator.clipboard
+          .writeText(text)
+          .then(() => showToast("Dicopy!", "success"));
+      }
+
+      function editSubdomain() {
+        document.getElementById("subdomainEditForm").style.display = "block";
+        document.getElementById("newSubdomainInput").value = currentStore.slug;
+      }
+
+      function cancelEditSubdomain() {
+        document.getElementById("subdomainEditForm").style.display = "none";
+      }
+
+      async function saveSubdomain() {
+        const newSlug = document.getElementById("newSubdomainInput").value;
+        if (!newSlug || newSlug === currentStore.slug)
+          return cancelEditSubdomain();
+
+        try {
+          const updated = await apiRequest(`/api/stores/${currentStore.id}`, {
+            method: "PUT",
+            body: JSON.stringify({ slug: newSlug }),
+          });
+          if (updated) {
+            currentStore = { ...currentStore, ...updated };
+            showToast("Subdomain updated!", "success");
+            cancelEditSubdomain();
+            loadSettings(); // Reload to update URLs
+          }
+        } catch (e) {
+          showToast(e.message || "Failed to update", "error");
+        }
+      }
+
+      async function setCustomDomain() {
+        const domain = document.getElementById("customDomainInput").value;
+        if (!domain) return;
+
+        try {
+          await apiRequest(`/api/stores/${currentStore.id}/domain`, {
+            method: "PUT",
+            body: JSON.stringify({ domain: domain }),
+          });
+          loadDomainInfo();
+        } catch (e) {
+          showToast(e.message || "Error setting domain", "error");
+        }
+      }
+
+      async function verifyDomain() {
+        try {
+          const res = await apiRequest(
+            `/api/stores/${currentStore.id}/domain/verify`,
+            {
+              method: "POST",
+            },
+          );
+          if (res.verified) {
+            showToast("Domain Verified!", "success");
+            loadDomainInfo();
+          } else {
+            showToast("Verifikasi gagal. Cek DNS anda.", "error");
+          }
+        } catch (e) {
+          showToast(e.message || "Verification error", "error");
+        }
+      }
+
+      async function removeDomain() {
+        if (!confirm("Hapus custom domain?")) return;
+        try {
+          await apiRequest(`/api/stores/${currentStore.id}/domain`, {
+            method: "DELETE",
+          });
+          document.getElementById("customDomainInput").value = "";
+          loadDomainInfo();
+        } catch (e) {
+          showToast(e.message || "Error removing domain", "error");
+        }
+      }
+
+      async function saveSettings(e) {
+        e.preventDefault();
+        const logoImg = document.querySelector("#logoPreview img");
+        const faviconImg = document.querySelector("#faviconPreview img"); // Get favicon
+
+        const payload = {
+          name: document.getElementById("storeName").value,
+          description: document.getElementById("storeDesc").value,
+          whatsapp: document.getElementById("storeWa").value,
+          logo_url: logoImg ? logoImg.src : currentStore.logo_url,
+          favicon_url: faviconImg ? faviconImg.src : currentStore.favicon_url, // Add favicon
+          hide_branding: document.getElementById("hideBrandingToggle").checked,
+        };
+
+        try {
+          const updated = await apiRequest(`/api/stores/${currentStore.id}`, {
+            method: "PUT",
+            body: JSON.stringify(payload),
+          });
+          if (updated) {
+            currentStore = { ...currentStore, ...updated };
+            showToast("Tersimpan!", "success");
+            loadSettings(); // Reload to refresh UI state if needed
+          }
+        } catch (error) {
+          console.error("Save settings error:", error);
+          showToast("Gagal menyimpan pengaturan", "error");
+        }
+      }
+
+      async function uploadLogo() {
+        const fileInput = document.getElementById("logoInput");
+        const file = fileInput.files[0];
+        if (!file || file.size > 1024 * 1024) {
+          showToast("Max 1MB", "error");
+          return;
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append("image", file);
+          const token = localStorage.getItem("sello_token");
+          const response = await fetch(
+            `/api/stores/${currentStore.id}/upload`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+              body: formData,
+            },
+          );
+          const data = await response.json();
+
+          if (response.ok) {
+            document.getElementById("logoPreview").innerHTML =
+              `<img src="${data.url}">`;
+
+            // Auto-save logo to database
+            const updated = await apiRequest(`/api/stores/${currentStore.id}`, {
+              method: "PUT",
+              body: JSON.stringify({ logo_url: data.url }),
+            });
+            if (updated) {
+              currentStore = { ...currentStore, ...updated };
+            }
+            showToast("Logo berhasil diupload & disimpan!", "success");
+          } else {
+            showToast(data.error || "Upload failed", "error");
+          }
+        } catch (err) {
+          showToast("Upload error", "error");
+        } finally {
+          fileInput.value = "";
+        }
+      }
+
+      async function uploadFavicon() {
+        const fileInput = document.getElementById("faviconInput");
+        const file = fileInput.files[0];
+        if (!file || file.size > 512 * 1024) {
+          // 512KB limit
+          showToast("Max 512KB", "error");
+          return;
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append("image", file);
+          const token = localStorage.getItem("sello_token");
+          const response = await fetch(
+            `/api/stores/${currentStore.id}/upload`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+              body: formData,
+            },
+          );
+          const data = await response.json();
+
+          if (response.ok) {
+            document.getElementById("faviconPreview").innerHTML =
+              `<img src="${data.url}">`;
+
+            // Auto-save favicon to database
+            const updated = await apiRequest(`/api/stores/${currentStore.id}`, {
+              method: "PUT",
+              body: JSON.stringify({ favicon_url: data.url }),
+            });
+            if (updated) {
+              currentStore = { ...currentStore, ...updated };
+            }
+            showToast("Favicon berhasil diupload & disimpan!", "success");
+          } else {
+            showToast(data.error || "Upload failed", "error");
+          }
+        } catch (err) {
+          showToast("Upload error", "error");
+        } finally {
+          fileInput.value = "";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadSettingsPage();
+        document
+          .getElementById("settingsForm")
+          .addEventListener("submit", saveSettings);
+      });
+
+      // =========================================
+      // Domain Management
+      // =========================================
+
+      async function loadDomainStatus() {
+        try {
+          const subdomainText = `${currentStore.slug}.sello.id`;
+          document.getElementById("subdomainUrl").textContent = subdomainText;
+          document.getElementById("subdomainLink").href =
+            `https://${subdomainText}`;
+
+          const data = await apiRequest(
+            `/api/stores/${currentStore.id}/domain`,
+          );
+          if (!data) return;
+
+          document.getElementById("domainForm").classList.add("hidden");
+          document.getElementById("domainVerify").classList.add("hidden");
+          document.getElementById("domainVerified").classList.add("hidden");
+
+          if (!data.has_domain) {
+            document.getElementById("domainForm").classList.remove("hidden");
+          } else if (data.verified) {
+            document
+              .getElementById("domainVerified")
+              .classList.remove("hidden");
+            const link = document.getElementById("verifiedDomainLink");
+            link.href = "https://" + data.domain;
+            link.textContent = data.domain;
+          } else {
+            document.getElementById("domainVerify").classList.remove("hidden");
+            document.getElementById("verifyTokenDisplay").textContent =
+              data.verify_token;
+            document.getElementById("pendingDomain").textContent = data.domain;
+          }
+        } catch (err) {
+          console.error("Failed to load domain status:", err);
+        }
+      }
+
+      function copySubdomain() {
+        const url = document.getElementById("subdomainUrl").textContent;
+        navigator.clipboard
+          .writeText("https://" + url)
+          .then(() => {
+            showToast("URL disalin!", "success");
+          })
+          .catch(() => {
+            showToast("Gagal menyalin", "error");
+          });
+      }
+
+      function editSubdomain() {
+        document.getElementById("subdomainEditForm").classList.add("active");
+        document.getElementById("newSubdomainInput").value = currentStore.slug;
+        document.getElementById("newSubdomainInput").focus();
+      }
+
+      function cancelEditSubdomain() {
+        document.getElementById("subdomainEditForm").classList.remove("active");
+      }
+
+      async function saveSubdomain() {
+        const newSlug = document
+          .getElementById("newSubdomainInput")
+          .value.trim()
+          .toLowerCase();
+
+        if (!newSlug || newSlug.length < 3) {
+          showToast("Subdomain minimal 3 karakter", "error");
+          return;
+        }
+
+        if (!/^[a-z0-9-]+$/.test(newSlug)) {
+          showToast("Hanya huruf, angka, dan strip (-)", "error");
+          return;
+        }
+
+        if (newSlug === currentStore.slug) {
+          cancelEditSubdomain();
+          return;
+        }
+
+        try {
+          const data = await apiRequest(`/api/stores/${currentStore.id}`, {
+            method: "PUT",
+            body: JSON.stringify({ slug: newSlug }),
+          });
+
+          if (data && data.slug) {
+            currentStore.slug = data.slug;
+            showToast("Subdomain berhasil diubah!", "success");
+            loadDomainStatus();
+            cancelEditSubdomain();
+          } else if (data && data.error) {
+            showToast(data.error, "error");
+          }
+        } catch (err) {
+          showToast("Gagal mengubah subdomain", "error");
+        }
+      }
+
+      async function setCustomDomain() {
+        const domain = document
+          .getElementById("customDomainInput")
+          .value.trim();
+        if (!domain) {
+          showToast("Masukkan domain", "error");
+          return;
+        }
+
+        try {
+          const data = await apiRequest(
+            `/api/stores/${currentStore.id}/domain`,
+            {
+              method: "PUT",
+              body: JSON.stringify({ domain }),
+            },
+          );
+
+          if (data && data.verify_token) {
+            showToast("Domain disimpan! Ikuti instruksi DNS.", "success");
+            loadDomainStatus();
+          } else if (data && data.error) {
+            showToast(data.error, "error");
+          }
+        } catch (err) {
+          showToast("Gagal menyimpan domain", "error");
+        }
+      }
+
+      async function verifyDomain() {
+        try {
+          const data = await apiRequest(
+            `/api/stores/${currentStore.id}/domain/verify`,
+            {
+              method: "POST",
+            },
+          );
+
+          if (data && data.verified) {
+            showToast("Domain berhasil diverifikasi! 🎉", "success");
+            loadDomainStatus();
+          } else if (data && data.error) {
+            showToast(data.error, "error");
+          }
+        } catch (err) {
+          showToast("Verifikasi gagal", "error");
+        }
+      }
+
+      async function removeDomain() {
+        if (!confirm("Hapus custom domain?")) return;
+
+        try {
+          await apiRequest(`/api/stores/${currentStore.id}/domain`, {
+            method: "DELETE",
+          });
+          showToast("Domain dihapus", "success");
+          loadDomainStatus();
+        } catch (err) {
+          showToast("Gagal menghapus domain", "error");
+        }
+      }
+
+      // Load domain status when page loads
+      const originalLoadSettings = loadSettings;
+      loadSettings = function () {
+        originalLoadSettings();
+        loadDomainStatus();
+      };
+    </script>
+  </body>
+</html>

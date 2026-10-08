@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Toko — Sello Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <style>
+      /* DataTables Customization */
+      .dataTables_wrapper .dataTables_length,
+      .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 20px;
+      }
+      .dataTables_wrapper .dataTables_length select,
+      .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: inherit;
+        font-size: 14px;
+        margin-left: 8px;
+        color: var(--text-primary);
+      }
+      .dataTables_wrapper .dataTables_filter input:focus,
+      .dataTables_wrapper .dataTables_length select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+      }
+      table.dataTable thead th {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px 24px !important;
+      }
+      table.dataTable tbody td {
+        padding: 16px 24px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        color: #334155;
+        font-size: 14px;
+        vertical-align: middle;
+      }
+      table.dataTable.no-footer {
+        border-bottom: 1px solid #e2e8f0 !important;
+      }
+
+      /* Buttons & Icons */
+      .btn-icon {
+        padding: 8px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        background: transparent;
+        cursor: pointer;
+        color: #475569;
+      }
+      .btn-icon:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+      .btn-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Badges */
+      .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: capitalize;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .badge-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+      }
+      .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+
+      .wrapper-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      /* Filter Bar */
+      .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .filter-trigger {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .filter-menu {
+        display: none;
+        position: absolute;
+        width: 200px;
+        z-index: 50;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        top: 100%;
+        left: 0;
+        margin-top: 4px;
+        padding: 6px;
+      }
+      .filter-menu.show {
+        display: block;
+      }
+      .filter-option {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .filter-option:hover {
+        background: #f1f5f9;
+      }
+      .active-filter-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: #e0f2fe;
+        border: 1px solid #bae6fd;
+        border-radius: 16px;
+        font-size: 13px;
+        color: #0369a1;
+      }
+      .filter-remove {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+      .filter-remove:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+      <div class="header" style="margin-bottom: 32px">
+        <h1
+          style="
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+          "
+        >
+          Kelola Toko
+        </h1>
+        <p style="color: var(--text-secondary)">
+          Pantau aktivitas dan status toko merchant.
+        </p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" id="filterBar" style="position: relative">
+        <!-- Filter Trigger -->
+        <div style="position: relative">
+          <button
+            class="filter-trigger"
+            id="addFilterBtn"
+            onclick="toggleFilterMenu()"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon
+                points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+              ></polygon>
+            </svg>
+            Filter
+          </button>
+          <!-- Dropdown Menu -->
+          <div class="filter-menu" id="filterMenu">
+            <div
+              style="
+                padding: 4px 8px;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text-muted);
+                text-transform: uppercase;
+              "
+            >
+              By Status
+            </div>
+            <div class="filter-option" onclick="showSubFilter('status')">
+              ⚡ Status Toko
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Filters Container -->
+        <div
+          id="activeFilters"
+          style="display: flex; flex-wrap: wrap; gap: 8px"
+        ></div>
+      </div>
+
+      <div class="wrapper-card">
+        <table id="storesTable" class="table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>Store Name</th>
+              <th>Produk</th>
+              <th>Created At</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="storesBody">
+            <!-- DataTables populates this -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <script src="/static/js/console-layout.js"></script>
+    <script>
+      const API_BASE = "/console/api";
+      const token = localStorage.getItem("admin_token");
+      if (!token) window.location.href = "/console/login";
+
+      let activeFilters = [];
+
+      async function apiRequest(url, options = {}) {
+        const res = await fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Request failed");
+        return data;
+      }
+
+      $(document).ready(function () {
+        loadStores();
+      });
+
+      async function loadStores() {
+        try {
+          // Build query params
+          let params = new URLSearchParams();
+          params.append("limit", "100");
+          activeFilters.forEach((f) => {
+            if (f.type === "status") params.append("status", f.value);
+          });
+
+          const res = await apiRequest(
+            `${API_BASE}/stores?${params.toString()}`,
+          );
+          if (!res || !res.data) return;
+          renderTable(res.data);
+        } catch (e) {
+          Swal.fire("Error", "Gagal memuat data toko: " + e.message, "error");
+        }
+      }
+
+      function renderTable(stores) {
+        if ($.fn.DataTable.isDataTable("#storesTable")) {
+          $("#storesTable").DataTable().destroy();
+        }
+
+        const tbody = document.getElementById("storesBody");
+        tbody.innerHTML = stores
+          .map(
+            (s) => `
+            <tr>
+                <td>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight: 600; color: #1e293b;">${s.name}</span>
+                        <a href="http://${s.slug}.sello.id" target="_blank" style="font-size:12px; color:#3b82f6; text-decoration:none;">${s.slug}.sello.id ↗</a>
+                    </div>
+                </td>
+                <td>
+                    <div style="font-weight: 600; color: #1e293b; color:#64748b;">
+                        ${s.products ? s.products.length : 0} Items
+                    </div>
+                </td>
+                <td>
+                  <div style="font-size: 13px; color: #64748b;">
+                    ${formatDate(s.created_at)}
+                  </div>
+                </td>
+                <td>
+                    <span class="badge ${s.is_suspended ? "badge-danger" : "badge-success"}">
+                        ${s.is_suspended ? "Suspended" : "Active"}
+                    </span>
+                    ${s.is_suspended && s.suspension_reason ? `<div style="font-size:11px; color:#ef4444; margin-top:4px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${s.suspension_reason}">Reason: ${s.suspension_reason}</div>` : ""}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn-icon" onclick="viewStoreDetail('${s.id}')" title="Lihat Detail">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                        ${renderStatusButton(s)}
+                        <button class="btn-icon" style="color:#2563eb;" onclick="seedStoreProducts('${s.id}', '${s.name}')" title="Inject Dummy Products">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </button>
+                        <button class="btn-icon" style="color:#ef4444;" onclick="deleteStore('${s.id}')" title="Hapus Store">
+                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `,
+          )
+          .join("");
+
+        $("#storesTable").DataTable({
+          responsive: true,
+          pageLength: 10,
+          language: {
+            searchPlaceholder: "Cari toko...",
+            info: "_START_-_END_ dari _TOTAL_",
+          },
+          columnDefs: [{ orderable: false, targets: 4 }],
+          dom: '<"d-flex justify-content-between align-items-center mb-4"lf>rt<"d-flex justify-content-between align-items-center mt-4"ip>',
+        });
+      }
+
+      function renderStatusButton(s) {
+        if (s.is_suspended) {
+          return `<button class="btn-icon" style="color: #16a34a;" onclick="activateStore('${s.id}')" title="Aktifkan Toko">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </button>`;
+        } else {
+          return `<button class="btn-icon" style="color: #dc2626;" onclick="suspendStore('${s.id}')" title="Suspend Toko">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+              </button>`;
+        }
+      }
+
+      function formatDate(dateStr) {
+        return new Date(dateStr).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      /* --- Actions --- */
+
+      async function seedStoreProducts(id, name) {
+        const { value: count } = await Swal.fire({
+          title: "Inject Produk Dummy",
+          text: `Masukkan jumlah produk yang ingin ditambahkan ke toko "${name}" (Max 50):`,
+          input: "number",
+          inputValue: 10,
+          inputAttributes: {
+            min: 1,
+            max: 50,
+            step: 1,
+          },
+          showCancelButton: true,
+          confirmButtonText: "Inject Sekarang",
+          confirmButtonColor: "#2563eb",
+          showLoaderOnConfirm: true,
+          preConfirm: async (count) => {
+            if (!count || count < 1) {
+              Swal.showValidationMessage("Jumlah minimal 1");
+              return;
+            }
+            try {
+              return await apiRequest(`${API_BASE}/stores/${id}/seed`, {
+                method: "POST",
+                body: JSON.stringify({ count: parseInt(count) }),
+              });
+            } catch (error) {
+              Swal.showValidationMessage(`Request failed: ${error.message}`);
+            }
+          },
+          allowOutsideClick: () => !Swal.isLoading(),
+        });
+
+        if (count) {
+          Swal.fire(
+            "Berhasil",
+            `Berhasil menambahkan produk dummy.`,
+            "success",
+          );
+          loadStores();
+        }
+      }
+
+      async function activateStore(id) {
+        const result = await Swal.fire({
+          title: "Aktifkan Toko?",
+          text: "Akses publik ke toko ini akan dipulihkan.",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#22c55e",
+          confirmButtonText: "Ya, Aktifkan",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            await apiRequest(`${API_BASE}/stores/${id}/activate`, {
+              method: "PUT",
+            });
+            Swal.fire("Berhasil", "Toko diaktifkan kembali", "success");
+            loadStores();
+          } catch (e) {
+            Swal.fire("Gagal", e.message, "error");
+          }
+        }
+      }
+
+      async function suspendStore(id) {
+        const { value: reason } = await Swal.fire({
+          title: "Suspend Toko?",
+          input: "textarea",
+          inputLabel: "Alasan Penangguhan",
+          inputPlaceholder:
+            "Contoh: Melanggar kebijakan penjualan barang terlarang...",
+          inputAttributes: {
+            "aria-label": "Alasan suspend",
+          },
+          showCancelButton: true,
+          confirmButtonColor: "#dc2626",
+          confirmButtonText: "Suspend Toko",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Anda harus menyertakan alasan!";
+            }
+          },
+        });
+
+        if (reason) {
+          try {
+            await apiRequest(`${API_BASE}/stores/${id}/suspend`, {
+              method: "PUT",
+              body: JSON.stringify({ reason: reason }),
+            });
+            Swal.fire("Tersuspend", "Toko berhasil disuspend.", "success");
+            loadStores();
+          } catch (e) {
+            Swal.fire("Gagal", e.message, "error");
+          }
+        }
+      }
+
+      async function deleteStore(id) {
+        const result = await Swal.fire({
+          title: "Hapus Toko?",
+          text: "Data toko dan produk akan terhapus. Aksi ini tidak dapat dibatalkan (kecuali soft delete database).",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc2626",
+          confirmButtonText: "Ya, Hapus Permanen",
+        });
+
+        if (result.isConfirmed) {
+          try {
+            await apiRequest(`${API_BASE}/stores/${id}`, { method: "DELETE" });
+            Swal.fire("Terhapus", "Toko dihapus", "success");
+            loadStores();
+          } catch (e) {
+            Swal.fire("Gagal", e.message, "error");
+          }
+        }
+      }
+
+      /* --- Filter Logic --- */
+      function toggleFilterMenu() {
+        const menu = document.getElementById("filterMenu");
+        menu.classList.toggle("show");
+      }
+      document.addEventListener("click", function (event) {
+        const bar = document.getElementById("filterBar");
+        const menu = document.getElementById("filterMenu");
+        if (!bar.contains(event.target)) {
+          menu.classList.remove("show");
+        }
+      });
+
+      async function showSubFilter(type) {
+        toggleFilterMenu();
+        if (type === "status") {
+          const { value: status } = await Swal.fire({
+            title: "Filter by Status",
+            input: "select",
+            inputOptions: {
+              active: "Active",
+              suspended: "Suspended",
+            },
+            inputPlaceholder: "Pilih Status",
+            showCancelButton: true,
+          });
+
+          if (status) {
+            addFilter(
+              "status",
+              status,
+              `Status: ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+            );
+          }
+        }
+      }
+
+      function addFilter(type, value, label) {
+        activeFilters = activeFilters.filter((f) => f.type !== type);
+        activeFilters.push({ type, value, label });
+        renderActiveFilters();
+        loadStores();
+      }
+
+      function removeFilter(index) {
+        activeFilters.splice(index, 1);
+        renderActiveFilters();
+        loadStores();
+      }
+
+      function renderActiveFilters() {
+        const container = document.getElementById("activeFilters");
+        container.innerHTML = activeFilters
+          .map(
+            (f, i) => `
+              <div class="active-filter-chip">
+                  <span>${f.label}</span>
+                  <div class="filter-remove" onclick="removeFilter(${i})">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </div>
+              </div>
+          `,
+          )
+          .join("");
+
+        const btn = document.getElementById("addFilterBtn");
+        if (activeFilters.length > 0) {
+          btn.style.borderColor = "var(--primary)";
+          btn.style.color = "var(--primary)";
+        } else {
+          btn.style.borderColor = "";
+          btn.style.color = "";
+        }
+      }
+
+      function viewStoreDetail(id) {
+        Swal.fire("Info", "Detail store page coming soon", "info");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+{
+  "name": "Starter",
+  "slug": "starter",
+  "description": "Basic Starter Theme for Sello",
+  "version": "2.0.0",
+  "thumbnail_url": "/themes/starter/assets/img/thumbnail.jpg",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Warna Global"
+    },
+    {
+      "id": "logo",
+      "type": "image",
+      "label": "Logo Toko (Opsional)",
+      "scope": "global",
+      "info": "Jika kosong, logo dari Pengaturan Toko akan digunakan."
+    },
+    {
+      "id": "primary_color",
+      "type": "color",
+      "label": "Warna Utama",
+      "default": "#3b82f6",
+      "scope": "global"
+    },
+    {
+      "id": "secondary_color",
+      "type": "color",
+      "label": "Warna Sekunder",
+      "default": "#1e293b",
+      "scope": "global"
+    },
+    {
+      "id": "background_color",
+      "type": "color",
+      "label": "Warna Latar",
+      "default": "#ffffff",
+      "scope": "global"
+    },
+    {
+      "id": "accent_color",
+      "type": "color",
+      "label": "Warna Aksen / Tombol",
+      "default": "#3b82f6",
+      "scope": "global"
+    },
+    {
+      "id": "text_color",
+      "type": "color",
+      "label": "Warna Teks",
+      "default": "#1f2937",
+      "scope": "global"
+    },
+    {
+      "id": "button_color",
+      "type": "color",
+      "label": "Warna Tombol",
+      "default": "#25d366",
+      "scope": "global"
+    },
+    {
+      "id": "button_hover_color",
+      "type": "color",
+      "label": "Warna Tombol (Hover)",
+      "default": "#128c7e",
+      "scope": "global"
+    },
+    {
+      "type": "header",
+      "content": "Beranda (Home)"
+    },
+    {
+      "id": "hero_title",
+      "type": "text",
+      "label": "Judul Utama (Hero)",
+      "default": "Welcome to Our Store",
+      "scope": "index"
+    },
+    {
+      "id": "hero_subtitle",
+      "type": "text",
+      "label": "Sub-Judul Hero",
+      "default": "Find the best products here.",
+      "scope": "index"
+    },
+    {
+      "id": "products_title",
+      "type": "text",
+      "label": "Judul Seksi Produk",
+      "default": "Produk Kami",
+      "scope": "index"
+    },
+    {
+      "type": "header",
+      "content": "Global Text"
+    },
+    {
+      "id": "cta_button_text",
+      "type": "text",
+      "label": "Teks Tombol Beli",
+      "default": "Beli Sekarang",
+      "scope": "global"
+    },
+    {
+      "id": "footer_text",
+      "type": "text",
+      "label": "Teks Footer",
+      "default": "Copyright 2024",
+      "scope": "global"
+    }
+  ],
+  "templates": {
+    "index": "home.html",
+    "product": "product.html"
+  }
+}

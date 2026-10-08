@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{product.name}} — {{store.name}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    {{#if store.favicon_url}}
+    <link rel="icon" href="{{store.favicon_url}}" />
+    {{else}}
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    {{/if}}
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+          font-family: 'Inter', system-ui, sans-serif;
+          background: {{background_color}};
+          color: {{text_color}};
+          min-height: 100vh;
+
+          /* Custom Variables */
+          --btn-bg: {{button_color}};
+          --btn-hover: {{button_hover_color}};
+      }
+      .container { max-width: 480px; margin: 0 auto; }
+
+      /* Header */
+      .product-header { position: sticky; top: 0; background: white; padding: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f3f4f6; z-index: 10; }
+      .back-btn { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #374151; }
+      .header-title { font-size: 16px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+      /* Gallery */
+      .product-gallery { position: relative; background: #f3f4f6; }
+      .main-image { width: 100%; aspect-ratio: 1; object-fit: cover; }
+      .gallery-thumbs { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; background: white; }
+      .gallery-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 2px solid transparent; cursor: pointer; }
+      .gallery-thumb.active { border-color: {{primary_color}}; }
+      .product-placeholder { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 64px; opacity: 0.5; background: #e5e7eb; color: #6b7280; }
+
+      /* Info */
+      .product-content { padding: 20px 16px; background: white; }
+      .product-name { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+      .product-price { font-size: 24px; font-weight: 700; color: {{accent_color}}; }
+      .product-original-price { font-size: 16px; color: #9ca3af; text-decoration: line-through; margin-left: 8px; }
+      .discount-badge { display: inline-block; background: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+      .product-desc { margin-top: 16px; padding-top: 16px; border-top: 1px solid #f3f4f6; font-size: 14px; line-height: 1.6; color: #4b5563; }
+
+      /* Rich Text Styles */
+      .product-desc p { margin-bottom: 1em !important; min-height: 1em; white-space: pre-wrap; }
+      .product-desc div { margin-bottom: 0.5em; }
+      .product-desc ul, .product-desc ol { margin-left: 1.2em; margin-bottom: 1em !important; }
+      .product-desc li { margin-bottom: 0.2em; }
+      .product-desc strong { font-weight: 600; color: #111827; }
+      .product-desc a { color: {{primary_color}}; text-decoration: underline; }
+
+      /* Store Info */
+      .store-info { display: flex; align-items: center; gap: 12px; padding: 16px; background: #f9fafb; margin: 16px 0; border-radius: 12px; }
+      .store-logo { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; background: #e5e7eb; }
+      .store-name { font-size: 14px; font-weight: 600; }
+      .store-badge { font-size: 12px; color: #6b7280; }
+
+      /* CTA */
+      .cta-section { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px; border-top: 1px solid #f3f4f6; }
+      .cta-container { max-width: 480px; margin: 0 auto; display: flex; gap: 12px; }
+      .btn-whatsapp { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--btn-bg); color: white; padding: 14px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; transition: all 0.2s; }
+      .btn-whatsapp:hover { background: var(--btn-hover); transform: translateY(-1px); }
+      .btn-share { width: 48px; height: 48px; border-radius: 10px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; color: #374151; background: white; cursor: pointer; }
+
+      /* Spacer for fixed CTA */
+      .cta-spacer { height: 80px; }
+    </style>
+  </head>
+  <body>
+    <header class="product-header">
+      <a href="{{home_url}}" class="back-btn">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <span class="header-title">{{product.name}}</span>
+    </header>
+
+    <main class="container">
+      <div class="product-gallery">
+        {{#if product.image_url}}
+        <img
+          src="{{product.image_url}}"
+          alt="{{product.name}}"
+          class="main-image"
+          id="mainImage"
+        />
+        {{else}}
+        <div class="product-placeholder" id="mainImage"><span>📦</span></div>
+        {{/if}} {{#if product.images}}
+        <div class="gallery-thumbs">
+          {{#each product.images}}
+          <img
+            src="{{this.url}}"
+            class="gallery-thumb {{#if @first}}active{{/if}}"
+            onclick="setMainImage('{{this.url}}', this)"
+          />
+          {{/each}}
+        </div>
+        {{/if}}
+      </div>
+
+      <div class="product-content">
+        <h1 class="product-name">{{product.name}}</h1>
+        <div>
+          <span class="product-price">Rp {{product.price}}</span>
+          {{#if product.original_price}}
+          <span class="product-original-price"
+            >Rp {{product.original_price}}</span
+          >
+          <span class="discount-badge">-{{product.discount_percent}}%</span>
+          {{/if}}
+        </div>
+
+        {{#if product.description}}
+        <div class="product-desc">{{product.description}}</div>
+        {{/if}}
+
+        <div class="store-info">
+          <img
+            src="{{#if store.logo_url}}{{store.logo_url}}{{else}}/static/images/sello-pp.webp{{/if}}"
+            alt="{{store.name}}"
+            class="store-logo"
+          />
+          <div>
+            <div class="store-name">{{store.name}}</div>
+            <div class="store-badge">🟢 Aktif</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-spacer"></div>
+    </main>
+
+    <div class="cta-section">
+      <div class="cta-container">
+        <a href="{{product.buy_url}}" class="btn-whatsapp" target="_blank">
+          💬 {{cta_button_text}}
+        </a>
+        <button class="btn-share" onclick="shareProduct()">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function setMainImage(url, thumb) {
+        document.getElementById("mainImage").src = url;
+        document
+          .querySelectorAll(".gallery-thumb")
+          .forEach((t) => t.classList.remove("active"));
+        thumb.classList.add("active");
+      }
+
+      function shareProduct() {
+        if (navigator.share) {
+          navigator.share({
+            title: "{{product.name}}",
+            url: window.location.href,
+          });
+        } else {
+          navigator.clipboard.writeText(window.location.href);
+          alert("Link disalin!");
+        }
+      }
+    </script>
+  </body>
+</html>

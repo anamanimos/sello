@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics — Sello Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-container {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+      <div
+        class="header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        "
+      >
+        <h1
+          style="font-size: 24px; font-weight: 700; color: var(--text-primary)"
+        >
+          Platform Analytics
+        </h1>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px">
+        <div class="chart-container">
+          <h3 style="margin-bottom: 16px; font-size: 16px">User Growth</h3>
+          <canvas id="userChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3 style="margin-bottom: 16px; font-size: 16px">Store Activity</h3>
+          <canvas id="storeChart"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/js/console-layout.js"></script>
+    <script>
+      // Dummy Charts
+      const ctx1 = document.getElementById("userChart").getContext("2d");
+      new Chart(ctx1, {
+        type: "line",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          datasets: [
+            {
+              label: "New Users",
+              data: [12, 19, 3, 5, 2, 3],
+              borderColor: "#10b981",
+              tension: 0.4,
+            },
+          ],
+        },
+        options: { responsive: true, maintainAspectRatio: false },
+      });
+
+      const ctx2 = document.getElementById("storeChart").getContext("2d");
+      new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          datasets: [
+            {
+              label: "New Stores",
+              data: [2, 5, 1, 0, 8, 4],
+              backgroundColor: "#3b82f6",
+            },
+          ],
+        },
+        options: { responsive: true, maintainAspectRatio: false },
+      });
+
+      // Logout function
+    </script>
+  </body>
+</html>

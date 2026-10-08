@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Tema — Sello Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      /* Theme Grid Layout */
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 24px;
+      }
+      .tab {
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+      }
+      .tab:hover {
+        color: var(--text-primary);
+      }
+      .tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Docs Styles */
+      .docs-container {
+        max-width: 800px;
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+      }
+      .docs-container h2 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+      }
+      .docs-container h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 24px;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+      }
+      .docs-container p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .docs-container code {
+        background: var(--bg-secondary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.9em;
+        color: var(--accent);
+      }
+      .docs-container pre {
+        background: var(--bg-tertiary);
+        padding: 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin-bottom: 16px;
+        border: 1px solid var(--border-light);
+      }
+      .docs-container pre code {
+        background: none;
+        padding: 0;
+        color: var(--text-primary);
+      }
+
+      .theme-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+      }
+      .theme-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+        border-color: var(--accent);
+      }
+
+      .theme-preview {
+        aspect-ratio: 16/9;
+        background: var(--bg-secondary);
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .theme-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .theme-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        color: var(--text-muted);
+      }
+      .theme-placeholder svg {
+        margin-bottom: 8px;
+        opacity: 0.5;
+      }
+
+      .theme-info {
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .theme-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 8px;
+      }
+      .theme-name {
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--text-primary);
+        margin: 0;
+      }
+      .theme-badges {
+        display: flex;
+        gap: 4px;
+      }
+      .theme-slug {
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-family: monospace;
+        background: var(--bg-secondary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 8px;
+      }
+      .theme-desc {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+        margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+      }
+
+      .theme-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-light);
+      }
+      .btn-full {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .badge {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .badge.premium {
+        background: #f3e8ff;
+        color: #9333ea;
+      }
+      .badge.active {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      .badge.inactive {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s;
+      }
+      .modal-overlay:not(.hidden) {
+        opacity: 1;
+        visibility: visible;
+      }
+      /* Fallback for hidden class if visibility transition not desired */
+      .modal-overlay.hidden {
+        display: none;
+      }
+
+      .modal {
+        background: var(--bg-primary);
+        width: 100%;
+        max-width: 600px;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--text-secondary);
+        cursor: pointer;
+      }
+      .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+      }
+      .modal-footer {
+        padding: 20px 24px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: var(--text-secondary);
+      }
+      .form-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+      }
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+      <div
+        class="header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        "
+      >
+        <div>
+          <h1
+            style="
+              font-size: 24px;
+              font-weight: 700;
+              color: var(--text-primary);
+              margin-bottom: 4px;
+            "
+          >
+            Kelola Tema
+          </h1>
+          <p style="color: var(--text-secondary)">
+            Atur koleksi tema yang tersedia untuk pengguna.
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal()">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Tambah Tema
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('library')">
+          Library
+        </button>
+        <button class="tab" onclick="switchTab('guide')">
+          Developer Guide
+        </button>
+      </div>
+
+      <!-- Library Tab -->
+      <div id="tab-library" class="tab-content active">
+        <div id="themesGrid" class="theme-grid">
+          <!-- Themes Injected Here -->
+          <div
+            class="empty-state"
+            style="
+              grid-column: 1/-1;
+              text-align: center;
+              padding: 40px;
+              color: var(--text-muted);
+            "
+          >
+            Running Skeleton Loader...
+          </div>
+        </div>
+      </div>
+
+      <!-- Guide Tab -->
+      <div id="tab-guide" class="tab-content">
+        <div class="docs-container">
+          <h2>Panduan Pengembang Tema</h2>
+          <p>
+            Sello menggunakan sistem tema berbasis file (disk-based themes).
+            Setiap tema adalah folder di dalam direktori
+            <code>web/themes/</code>.
+          </p>
+
+          <h3>1. Struktur Folder Tema</h3>
+          <p>Setiap tema harus memiliki struktur berikut:</p>
+          <pre><code>web/themes/[theme-slug]/
+├── theme.json         # Konfigurasi utama (wajib)
+├── assets/            # CSS, JS, Gambar statis
+│   ├── style.css
+│   └── script.js
+├── layouts/           # Layout pembungkus (base)
+│   └── base.html
+├── pages/             # Template halaman
+│   ├── home.html
+│   └── product.html
+├── components/        # Komponen reusable (opsional)
+│   ├── navbar.html
+│   └── footer.html
+└── thumbnail.png      # Preview image</code></pre>
+
+          <h3>2. Konfigurasi (theme.json)</h3>
+          <p>
+            File ini mendefinisikan metadata, template mapping, dan opsi
+            kustomisasi yang bisa diedit user.
+          </p>
+          <pre><code>{
+  "name": "Modern Store",
+  "version": "1.0.0",
+  "templates": {
+    "home": "pages/home.html",
+    "product_detail": "pages/product.html"
+  },
+  "settings": [
+    {
+      "id": "colors",
+      "title": "Warna",
+      "sections": [
+        {
+          "id": "primary_color",
+          "label": "Warna Utama",
+          "settings": [
+            {
+              "id": "main_bg",
+              "type": "color",
+              "label": "Background",
+              "default": "#ffffff"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+          <h3>3. Variabel Template (Go Templates)</h3>
+          <p>
+            Anda dapat mengakses data dinamis menggunakan syntax Go Template.
+            Pastikan menggunakan format
+            <code>&#123;&#123; .Variabel &#125;&#125;</code>.
+          </p>
+
+          <div
+            style="
+              overflow-x: auto;
+              border: 1px solid var(--border-color);
+              border-radius: 8px;
+              margin-top: 16px;
+            "
+          >
+            <table
+              style="width: 100%; border-collapse: collapse; font-size: 14px"
+            >
+              <thead>
+                <tr style="background: var(--bg-tertiary); text-align: left">
+                  <th
+                    style="
+                      padding: 12px;
+                      border-bottom: 2px solid var(--border-color);
+                    "
+                  >
+                    Variabel
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      border-bottom: 2px solid var(--border-color);
+                    "
+                  >
+                    Konteks
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      border-bottom: 2px solid var(--border-color);
+                    "
+                  >
+                    Deskripsi
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code>&#123;&#123; .Store.Name &#125;&#125;</code>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Semua Halaman
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Nama toko yang sedang dibuka.
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code>&#123;&#123; .Store.Whatsapp &#125;&#125;</code>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Semua Halaman
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Nomor WhatsApp toko (format internasional).
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code>&#123;&#123; .Store.LogoURL &#125;&#125;</code>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Semua Halaman
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    URL logo toko (jika ada).
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code>&#123;&#123; .Products &#125;&#125;</code>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Halaman Home
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    List (Array) semua produk aktif. Bisa diloop dengan
+                    <code>range</code>.
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code>&#123;&#123; .Product.Name &#125;&#125;</code>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Halaman Detail
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Nama produk yang sedang dilihat.
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code
+                      >&#123;&#123; .Product.PriceFormatted &#125;&#125;</code
+                    >
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Halaman Detail
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Harga produk dalam format Rupiah (Rp 10.000).
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    <code
+                      >&#123;&#123; .ThemeConfig.colors... &#125;&#125;</code
+                    >
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Semua Halaman
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border-bottom: 1px solid var(--border-color);
+                    "
+                  >
+                    Mengakses konfigurasi tema yang diatur user (sesuai
+                    theme.json).
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>4. Tema Premium & Eksklusif</h3>
+          <p>
+            Panduan untuk menandai tema sebagai konten berbayar atau khusus:
+          </p>
+          <div
+            style="
+              background: var(--bg-secondary);
+              padding: 16px;
+              border-radius: 8px;
+              border-left: 4px solid var(--accent);
+            "
+          >
+            <h4 style="margin: 0 0 8px; color: var(--text-primary)">
+              💎 Tema Premium
+            </h4>
+            <p style="margin: 0 0 12px; font-size: 14px">
+              Tema yang hanya tersedia untuk pengguna paket berbayar
+              (Pro/Business).
+            </p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px">
+              <li>
+                Saat menambah/edit tema, centang opsi <strong>Premium</strong>.
+              </li>
+              <li>Tema akan otomatis terkunci untuk pengguna Free Plan.</li>
+              <li>Badge "PRO" akan muncul di katalog tema.</li>
+            </ul>
+          </div>
+
+          <div
+            style="
+              background: var(--bg-secondary);
+              padding: 16px;
+              border-radius: 8px;
+              border-left: 4px solid #f59e0b;
+              margin-top: 16px;
+            "
+          >
+            <h4 style="margin: 0 0 8px; color: var(--text-primary)">
+              🔒 Tema Eksklusif
+            </h4>
+            <p style="margin: 0 0 12px; font-size: 14px">
+              Tema custom yang dibuat khusus untuk satu klien tertentu.
+            </p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px">
+              <li>Upload folder tema ke server.</li>
+              <li>
+                Tambahkan ke Library tapi
+                <strong>JANGAN centang "Aktif"</strong>.
+              </li>
+              <li>
+                Hubungi developer untuk assign tema secara manual ke Store ID
+                tertentu via database.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay hidden" id="themeModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalTitle">Tambah Tema</h2>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <form id="themeForm" onsubmit="saveTheme(event)">
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nama Tema</label>
+                <input
+                  type="text"
+                  id="themeName"
+                  class="form-input"
+                  placeholder="Modern Store"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Slug</label>
+                <input
+                  type="text"
+                  id="themeSlug"
+                  class="form-input"
+                  placeholder="modern-store"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Deskripsi</label>
+              <input
+                type="text"
+                id="themeDesc"
+                class="form-input"
+                placeholder="Tema modern dengan layout bersih"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Thumbnail URL</label>
+              <input
+                type="text"
+                id="themeThumb"
+                class="form-input"
+                placeholder="https://..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">HTML Template</label>
+              <textarea
+                id="themeHTML"
+                class="form-input"
+                placeholder="<html>...</html>"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Default Config (JSON)</label>
+              <textarea
+                id="themeConfig"
+                class="form-input"
+                style="min-height: 150px"
+                placeholder='{"colors":{"primary":"#3b82f6"},"texts":{"hero_title":"Selamat Datang"}}'
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Urutan</label>
+                <input
+                  type="number"
+                  id="themeSortOrder"
+                  class="form-input"
+                  value="0"
+                />
+              </div>
+              <div
+                class="form-group"
+                style="
+                  display: flex;
+                  gap: 24px;
+                  align-items: flex-end;
+                  padding-bottom: 12px;
+                "
+              >
+                <label class="checkbox-label">
+                  <input type="checkbox" id="themeActive" checked />
+                  Aktif
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="themePremium" />
+                  Premium
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeModal()"
+            >
+              Batal
+            </button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/static/js/console-layout.js"></script>
+    <script>
+      let themes = [];
+      let editingId = null;
+      const token = localStorage.getItem("admin_token");
+      if (!token) window.location.href = "/console/login";
+
+      async function apiRequest(url, options = {}) {
+        const res = await fetch(url, {
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            ...options.headers,
+          },
+        });
+        return res.json();
+      }
+
+      async function loadThemes() {
+        themes = await apiRequest("/console/api/themes");
+        renderThemes();
+      }
+
+      function renderThemes() {
+        const grid = document.getElementById("themesGrid");
+
+        if (!themes || themes.length === 0) {
+          grid.innerHTML = `<div style="grid-column: 1/-1; padding: 60px; text-align: center; border: 2px dashed var(--border-color); border-radius: 12px; background: #fff;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🎨</div>
+                <h3 style="font-weight: 600; margin-bottom: 8px;">Belum ada tema</h3>
+                <p style="color: var(--text-secondary);">Mulai dengan menambahkan tema baru.</p>
+            </div>`;
+          return;
+        }
+
+        grid.innerHTML = themes
+          .map((t) => {
+            // Placeholder logic
+            let thumb = `<div class="theme-placeholder">
+                            <i data-lucide="image" style="width: 32px; height: 32px; opacity: 0.5;"></i>
+                            <span style="font-size: 12px; margin-top: 8px;">No Preview</span>
+                         </div>`;
+
+            if (t.thumbnail_url && t.thumbnail_url.trim() !== "") {
+              // Using onerror to fallback to placeholder
+              thumb = `<img src="${t.thumbnail_url}" alt="${t.name}" onerror="this.parentElement.innerHTML='<div class=\\'theme-placeholder\\'><i data-lucide=\\'image-off\\' style=\\'width:32px;height:32px;opacity:0.5;margin-bottom:8px;\\'></i><span style=\\'font-size:12px;\\'>Image Broken</span></div>'; lucide.createIcons();">`;
+            }
+
+            return `
+            <div class="theme-card">
+                <div class="theme-preview">
+                    ${thumb}
+                </div>
+                <div class="theme-info">
+                    <div class="theme-header">
+                        <h3 class="theme-name">${t.name}</h3>
+                        <div class="theme-badges">
+                            ${t.is_premium ? '<span class="badge premium">PRO</span>' : ""}
+                            ${t.is_active ? '<span class="badge active">Active</span>' : '<span class="badge inactive">Inactive</span>'}
+                        </div>
+                    </div>
+                    <div class="theme-slug">${t.slug}</div>
+                    <p class="theme-desc">${t.description || "Tidak ada deskripsi."}</p>
+                    
+                    <div class="theme-actions">
+                        <button class="btn btn-outline btn-sm btn-full" onclick="editTheme('${t.id}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="btnDeleteTheme('${t.id}')" style="padding: 6px 10px;">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+          })
+          .join("");
+
+        // Re-initialize icons after render
+        setTimeout(() => lucide.createIcons(), 50);
+      }
+
+      function btnDeleteTheme(id) {
+        if (confirm("Yakin ingin menghapus tema ini?")) {
+          deleteTheme(id);
+        }
+      }
+
+      function openModal(theme = null) {
+        const modal = document.getElementById("themeModal");
+        const title = document.getElementById("modalTitle");
+        const form = document.getElementById("themeForm");
+
+        modal.classList.remove("hidden");
+        editingId = theme ? theme.id : null;
+
+        if (theme) {
+          title.textContent = "Edit Tema";
+          document.getElementById("themeName").value = theme.name;
+          document.getElementById("themeSlug").value = theme.slug;
+          document.getElementById("themeSlug").disabled = true; // Cannot change slug
+          document.getElementById("themeDesc").value = theme.description || "";
+          document.getElementById("themeThumb").value =
+            theme.thumbnail_url || "";
+          // Note: html_content is not returned by ListThemes, so we might need to fetch it if we want to edit it
+          // For now, we leave it empty or show a placeholder note
+          document.getElementById("themeHTML").value = "";
+
+          const configVal =
+            typeof theme.default_config === "string"
+              ? JSON.parse(theme.default_config || "{}")
+              : theme.default_config || {};
+
+          document.getElementById("themeConfig").value = JSON.stringify(
+            configVal,
+            null,
+            2,
+          );
+          document.getElementById("themeSortOrder").value =
+            theme.sort_order || 0;
+          document.getElementById("themeActive").checked = theme.is_active; // !IsHidden
+          document.getElementById("themePremium").checked = theme.is_premium;
+        } else {
+          title.textContent = "Tambah Tema";
+          form.reset();
+          document.getElementById("themeSlug").disabled = false;
+          document.getElementById("themeSortOrder").value = 0;
+          document.getElementById("themeActive").checked = true;
+          document.getElementById("themeConfig").value = "{}";
+        }
+      }
+
+      function editTheme(id) {
+        const theme = themes.find((t) => t.id === id);
+        if (theme) openModal(theme);
+      }
+
+      function closeModal() {
+        document.getElementById("themeModal").classList.add("hidden");
+      }
+
+      async function saveTheme(e) {
+        e.preventDefault();
+
+        // Validate JSON
+        const configStr = document.getElementById("themeConfig").value;
+        try {
+          if (configStr) JSON.parse(configStr);
+        } catch (err) {
+          Swal.fire("Error", "JSON Config tidak valid", "error");
+          return;
+        }
+
+        const payload = {
+          name: document.getElementById("themeName").value,
+          slug: document.getElementById("themeSlug").value,
+          description: document.getElementById("themeDesc").value,
+          thumbnail_url: document.getElementById("themeThumb").value,
+          html_content: document.getElementById("themeHTML").value, // Key matched to backend
+          default_config: configStr, // Send as string, backend unmarshals
+          sort_order:
+            parseInt(document.getElementById("themeSortOrder").value) || 0,
+          is_active: document.getElementById("themeActive").checked,
+          is_premium: document.getElementById("themePremium").checked,
+        };
+
+        const url = editingId
+          ? `/console/api/themes/${editingId}`
+          : "/console/api/themes";
+        const method = editingId ? "PUT" : "POST";
+
+        try {
+          const res = await apiRequest(url, {
+            method,
+            body: JSON.stringify(payload),
+          });
+
+          if (res.error) {
+            throw new Error(res.error);
+          }
+
+          closeModal();
+          loadThemes();
+          Swal.fire(
+            "Berhasil",
+            editingId ? "Tema diperbarui" : "Tema ditambahkan",
+            "success",
+          );
+        } catch (err) {
+          Swal.fire("Error", err.message || "Gagal menyimpan tema", "error");
+        }
+      }
+
+      async function deleteTheme(id) {
+        const result = await Swal.fire({
+          title: "Hapus Tema?",
+          text: "Tema yang sedang digunakan tidak dapat dihapus",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#ef4444",
+          confirmButtonText: "Ya, Hapus",
+          cancelButtonText: "Batal",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          const res = await apiRequest(`/console/api/themes/${id}`, {
+            method: "DELETE",
+          });
+          if (res.error) {
+            Swal.fire("Error", res.error, "error");
+          } else {
+            loadThemes();
+            Swal.fire("Berhasil", "Tema dihapus", "success");
+          }
+        } catch (err) {
+          Swal.fire("Error", "Gagal menghapus tema", "error");
+        }
+      }
+
+      function switchTab(tab) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document
+          .querySelector(`[onclick="switchTab('${tab}')"]`)
+          .classList.add("active");
+        document.getElementById(`tab-${tab}`).classList.add("active");
+      }
+
+      // Logout function
+      function logout() {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_user");
+        window.location.href = "/console/login";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!token) {
+          window.location.href = "/console/login";
+          return;
+        }
+        loadThemes();
+        lucide.createIcons();
+      });
+    </script>
+  </body>
+</html>

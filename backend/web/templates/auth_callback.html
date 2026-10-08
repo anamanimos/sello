@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processing Login...</title>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f9fafb;
+        color: #4b5563;
+      }
+      .loader {
+        text-align: center;
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loader">
+      <div class="spinner"></div>
+      <p>Menyelesaikan login...</p>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        // 1. Get Token from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token");
+
+        if (token) {
+          // 2. Save Token
+          localStorage.setItem("sello_token", token);
+
+          // 3. Fetch User Data to Check Onboarding Status
+          try {
+            const response = await fetch("/api/auth/me", {
+              headers: {
+                Authorization: "Bearer " + token,
+              },
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              localStorage.setItem("sello_user", JSON.stringify(data.user));
+
+              // CHECK ONBOARDING: Must have Whatsapp AND at least 1 Store
+              const hasWhatsapp =
+                data.user.whatsapp && data.user.whatsapp.length > 5;
+              const hasStore = data.stores && data.stores.length > 0;
+
+              if (!hasWhatsapp || !hasStore) {
+                window.location.href = "/onboarding";
+                return;
+              }
+            }
+          } catch (e) {
+            console.error("Failed to fetch user data", e);
+          }
+
+          // 4. Redirect to Dashboard (if onboarding complete)
+          window.location.href = "/dashboard";
+        } else {
+          // Error: No token found
+          alert("Login Gagal: Token tidak ditemukan.");
+          window.location.href = "/login";
+        }
+      });
+    </script>
+  </body>
+</html>

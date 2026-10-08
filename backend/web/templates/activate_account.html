@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aktivasi Akun - Sello</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/auth.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+  </head>
+  <body class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <a href="/" class="logo">
+            <img src="/static/images/sello-logo.webp" alt="Sello" height="40" />
+          </a>
+          <h1>Verifikasi Akun</h1>
+          <p>Masukkan kode OTP yang kami kirimkan.</p>
+        </div>
+
+        <div
+          id="alertMessage"
+          class="alert"
+          style="
+            display: none;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+          "
+        ></div>
+
+        <form id="activateForm" class="auth-form">
+          <input type="hidden" id="userId" />
+          <div class="form-group">
+            <label>Kode OTP</label>
+            <input
+              type="text"
+              id="otp"
+              placeholder="123456"
+              style="letter-spacing: 4px; font-size: 24px; text-align: center"
+              maxlength="6"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            Verifikasi Akun
+          </button>
+        </form>
+
+        <div class="auth-footer" style="margin-top: 24px; text-align: center">
+          <p style="margin-bottom: 8px">Tidak menerima kode?</p>
+          <div style="display: flex; gap: 8px; justify-content: center">
+            <button
+              onclick="resendOTP('email')"
+              class="btn-link"
+              style="
+                background: none;
+                border: none;
+                color: var(--primary);
+                cursor: pointer;
+              "
+            >
+              Kirim via Email
+            </button>
+            <span>|</span>
+            <button
+              onclick="resendOTP('whatsapp')"
+              class="btn-link"
+              style="
+                background: none;
+                border: none;
+                color: var(--primary);
+                cursor: pointer;
+              "
+            >
+              Kirim via WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Check URL params or LocalStorage for user_id/context
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId =
+        urlParams.get("uid") || localStorage.getItem("pending_uid");
+
+      if (!userId) {
+        alert("Sesi tidak valid. Silakan register ulang.");
+        window.location.href = "/register";
+      }
+      document.getElementById("userId").value = userId;
+
+      const form = document.getElementById("activateForm");
+      const alertBoxes = document.getElementById("alertMessage");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const code = document.getElementById("otp").value;
+
+        try {
+          // Try whatsapp first, if fails try email? No, backend needs type.
+          // We should probably prompt user or try both sequentially?
+          // Or simplified: Just try check against ANY active OTP for this user.
+          // Backend 'VerifyOTP' checks valid OTP regardless of type if we adjust it,
+          // but current handler VerifyInput requires 'Type'.
+          // Let's assume user knows where they got it? Or we iterate?
+          // Let's iterate types invisibly for better UX.
+
+          let success = await attemptVerify(userId, code, "whatsapp");
+          if (!success) {
+            success = await attemptVerify(userId, code, "email");
+          }
+
+          if (success) {
+            localStorage.removeItem("pending_uid");
+            window.location.href = "/login?verified=true";
+          } else {
+            showMessage("Kode OTP salah atau kedaluwarsa.", "error");
+          }
+        } catch (err) {
+          showMessage("Terjadi kesalahan.", "error");
+        }
+      });
+
+      async function attemptVerify(uid, code, type) {
+        const res = await fetch("/api/auth/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: uid, code: code, type: type }),
+        });
+        return res.ok;
+      }
+
+      async function resendOTP(type) {
+        const res = await fetch("/api/auth/resend-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, type: type }),
+        });
+        if (res.ok) {
+          showMessage(`OTP dikirim ulang via ${type}.`, "success");
+        } else {
+          showMessage("Gagal mengirim ulang OTP.", "error");
+        }
+      }
+
+      function showMessage(msg, type) {
+        alertBoxes.textContent = msg;
+        alertBoxes.style.background = type === "error" ? "#fee2e2" : "#d1fae5";
+        alertBoxes.style.color = type === "error" ? "#991b1b" : "#065f46";
+        alertBoxes.style.display = "block";
+      }
+    </script>
+  </body>
+</html>

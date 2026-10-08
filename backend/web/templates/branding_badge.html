@@ -1,0 +1,59 @@
+{{define "branding_badge.html"}} {{if .ShowBranding}}
+<style>
+  .sello-branding-badge {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 8px 16px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    color: #4b5563;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    z-index: 9999;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .sello-branding-badge:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    color: #111827;
+  }
+
+  .sello-branding-logo {
+    height: 16px;
+    width: auto;
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .sello-branding-badge {
+      bottom: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+<a
+  href="{{if .IsSubdomain}}https://sello.id{{else}}/landing{{end}}"
+  class="sello-branding-badge"
+  target="_blank"
+>
+  <span>Dibuat dengan</span>
+  <img
+    src="/static/images/sello-logo.webp"
+    alt="Sello"
+    class="sello-branding-logo"
+  />
+</a>
+{{end}} {{end}}

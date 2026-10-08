@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{store.name}} — Katalog Produk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {{#if store.favicon_url}}
+    <link rel="icon" href="{{store.favicon_url}}" />
+    {{else}}
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+    {{/if}}
+    <style>
+      :root {
+         /* Theme Colors mapped to CSS Variables */
+         --primary: {{primary_color}};
+         --accent: {{accent_color}};
+         --bg-body: {{background_color}};
+         --text-main: {{text_color}};
+         --btn-bg: {{button_color}};
+         --btn-hover: {{button_hover_color}};
+
+         /* Gray Scale (Tailwind based) */
+         --gray-50: #f9fafb;
+         --gray-100: #f3f4f6;
+         --gray-200: #e5e7eb;
+         --gray-300: #d1d5db;
+         --gray-400: #9ca3af;
+         --gray-500: #6b7280;
+         --gray-600: #4b5563;
+         --gray-700: #374151;
+         --gray-800: #1f2937;
+         --gray-900: #111827;
+
+         /* Utilities */
+         --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+         --radius: 0.375rem;
+         --radius-lg: 0.5rem;
+         --radius-full: 9999px;
+         --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+          font-family: 'Inter', system-ui, sans-serif;
+          background: var(--bg-body);
+          color: var(--text-main);
+          min-height: 100vh;
+      }
+
+      /* Container Update for Flex */
+      .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 0 16px;
+      }
+      .store-header .container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+      }
+
+      @media (min-width: 640px) { .container { max-width: 640px; } }
+      @media (min-width: 768px) {
+          .container { max-width: 768px; }
+          .store-header .container {
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+              gap: 0;
+          }
+      }
+      @media (min-width: 1024px) { .container { max-width: 1024px; padding: 0 24px; } }
+      @media (min-width: 1280px) { .container { max-width: 1280px; } }
+
+      /* Store Header */
+      .store-header {
+        background: white;
+        padding: 16px 0;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        z-index: 10;
+      }
+
+      .store-header-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .store-logo-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid var(--gray-200);
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .store-logo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .store-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+      }
+
+      .store-name {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--gray-900);
+        line-height: 1.2;
+      }
+
+      .store-badge {
+        padding: 4px 10px;
+        background: #dcfce7;
+        color: #16a34a;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: var(--radius-full);
+      }
+
+      .store-desc {
+        font-size: 14px;
+        color: var(--gray-600);
+        max-width: 600px;
+        line-height: 1.5;
+      }
+
+      .btn-whatsapp {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 20px;
+        background: var(--btn-bg);
+        color: white;
+        font-weight: 600;
+        border-radius: var(--radius);
+        transition: var(--transition);
+        font-size: 14px;
+        width: 100%;
+        text-decoration: none;
+      }
+      .btn-whatsapp:hover { opacity: 0.9; transform: translateY(-1px); background: var(--btn-hover); }
+      .btn-sm { padding: 6px 12px; font-size: 13px; width: auto; border-radius: 6px;}
+
+      /* Main Content */
+      .store-main { padding: 24px 0 60px; }
+
+      /* Search & Filter */
+      .store-filter-section { margin-bottom: 24px; }
+      .search-box { position: relative; margin-bottom: 16px; }
+      .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+      .search-input {
+          width: 100%;
+          padding: 12px 12px 12px 40px;
+          border: 1px solid var(--gray-200);
+          border-radius: var(--radius-full);
+          font-size: 14px;
+          outline: none;
+          transition: var(--transition);
+      }
+      .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1); }
+
+      .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+      .category-scroll::-webkit-scrollbar { display: none; }
+      .cat-chip {
+          padding: 8px 16px;
+          background: white;
+          border: 1px solid var(--gray-200);
+          border-radius: var(--radius-full);
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--gray-600);
+          white-space: nowrap;
+          text-decoration: none;
+          transition: var(--transition);
+      }
+      .cat-chip:hover { background: var(--gray-50); border-color: var(--gray-300); }
+      .cat-chip.active { background: var(--gray-900); color: white; border-color: var(--gray-900); }
+
+      /* Products Grid */
+      .products-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+      .products-header h2 { font-size: 20px; font-weight: 700; color: var(--gray-900); }
+      .product-count { font-size: 12px; color: var(--gray-500); background: var(--gray-100); padding: 4px 10px; border-radius: var(--radius-full); }
+
+      .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+      .product-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border: 1px solid transparent; /* Fix jagged edges */
+      }
+      .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+      .product-image { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--gray-100); }
+      .product-image img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
+      .product-card:hover .product-image img { transform: scale(1.05); }
+
+      .product-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; opacity: 0.5; }
+
+      .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+      .product-name {
+          font-size: 15px; font-weight: 600; color: var(--gray-900); margin-bottom: 6px;
+          line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .product-desc {
+          font-size: 13px; color: var(--gray-500); line-height: 1.4; margin-bottom: 12px;
+          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .product-desc * { display: inline; margin: 0; padding: 0; } /* Force inline to handle HTML content */
+
+      .product-footer {
+          display: flex; align-items: center; justify-content: space-between;
+          margin-top: auto; padding-top: 12px; border-top: 1px solid var(--gray-100);
+      }
+      .product-price { font-size: 16px; font-weight: 700; color: var(--primary); }
+
+      /* Empty State */
+      .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: var(--radius-lg); border: 1px dashed var(--gray-300); }
+      .empty-icon { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5; }
+
+      /* Footer */
+      .store-footer { padding: 40px 0; text-align: center; color: var(--gray-500); font-size: 13px; border-top: 1px solid var(--gray-100); margin-top: 40px; }
+      .store-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
+
+      /* Visual Editor Helper - Removed by request */
+
+      /* Responsive */
+      @media (min-width: 768px) {
+          .store-header { padding: 24px 0; }
+          /* .store-header .container handled above */
+          .store-header-content { flex-direction: row; align-items: center; }
+          .store-info { align-items: flex-start; text-align: left; }
+          .store-name { font-size: 24px; }
+          .btn-whatsapp { width: auto; }
+
+          .products-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
+          .product-price { font-size: 18px; }
+      }
+      @media (min-width: 1024px) {
+          .products-grid { grid-template-columns: repeat(5, 1fr); gap: 24px; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Store Header -->
+    <header class="store-header">
+      <div class="container">
+        <div class="store-header-content">
+          <div class="store-logo-wrapper">
+            <img
+              src="{{#if store.logo_url}}{{store.logo_url}}{{else}}/static/images/sello-pp.webp{{/if}}"
+              alt="{{store.name}}"
+              class="store-logo"
+            />
+          </div>
+          <div class="store-info">
+            <h1 class="store-name" data-bind="store.name">{{store.name}}</h1>
+            <div class="store-meta">
+              <span class="store-badge">🟢 Online</span>
+            </div>
+            {{#if store.description}}
+            <p class="store-desc" data-bind="store.description">
+              {{store.description}}
+            </p>
+            {{/if}}
+          </div>
+        </div>
+        <a
+          href="https://wa.me/{{store.whatsapp}}"
+          class="btn-whatsapp"
+          target="_blank"
+          data-bind="cta_button_text"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+            />
+          </svg>
+          {{cta_button_text}}
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="container" style="margin-top: 24px; text-align: center">
+      <h2
+        style="
+          font-size: 28px;
+          font-weight: 800;
+          color: var(--gray-900);
+          margin-bottom: 8px;
+        "
+        data-bind="hero_title"
+      >
+        {{hero_title}}
+      </h2>
+      <p
+        style="color: var(--gray-500); max-width: 600px; margin: 0 auto 24px"
+        data-bind="hero_subtitle"
+      >
+        {{hero_subtitle}}
+      </p>
+    </div>
+
+    <!-- Products Grid -->
+    <main class="store-main">
+      <div class="container">
+        <!-- Search & Filter -->
+        <div class="store-filter-section">
+          <div class="search-box">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Cari produk..."
+              id="searchInput"
+            />
+          </div>
+
+          <div class="category-scroll">
+            <a href="#" class="cat-chip active">Semua</a>
+            {{#each categories}}
+            <a href="#" class="cat-chip" data-cat="{{this.id}}"
+              >{{this.name}}</a
+            >
+            {{/each}}
+          </div>
+        </div>
+
+        <div class="products-header">
+          <h2 data-bind="products_title">{{products_title}}</h2>
+          <span class="product-count">{{products_count}} produk</span>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+          {{#each products}}
+          <div class="product-card">
+            <a
+              href="{{product_link}}"
+              style="text-decoration: none; color: inherit; display: contents"
+            >
+              <div class="product-image">
+                {{#if this.image_url}}
+                <img
+                  src="{{this.image_url}}"
+                  alt="{{this.name}}"
+                  loading="lazy"
+                />
+                {{else}}
+                <div class="product-placeholder"><span>📦</span></div>
+                {{/if}}
+              </div>
+              <div class="product-info">
+                <h3 class="product-name">{{this.name}}</h3>
+                <div class="product-desc">{{this.description}}</div>
+                <div class="product-footer">
+                  {{#if this.original_price}}
+                  <div>
+                    <span
+                      class="product-price"
+                      style="
+                        font-size: 14px;
+                        text-decoration: line-through;
+                        color: #9ca3af;
+                        margin-right: 4px;
+                      "
+                      >Rp {{this.original_price}}</span
+                    >
+                    <span class="product-price">Rp {{this.price}}</span>
+                  </div>
+                  {{else}}
+                  <span class="product-price">Rp {{this.price}}</span>
+                  {{/if}}
+                  <object>
+                    <a
+                      href="https://wa.me/{{../store.whatsapp}}?text=Halo, saya tertarik dengan {{this.name}} (Rp {{this.price}})"
+                      class="btn-whatsapp btn-sm"
+                      target="_blank"
+                      onclick="event.stopPropagation()"
+                    >
+                      Pesan
+                    </a>
+                  </object>
+                </div>
+              </div>
+            </a>
+          </div>
+          {{else}}
+          <div class="empty-state">
+            <span class="empty-icon">📦</span>
+            <h3>Belum ada produk</h3>
+            <p>Toko ini belum menambahkan produk</p>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="store-footer">
+      <div class="container">
+        <p data-bind="footer_text">{{footer_text}}</p>
+      </div>
+    </footer>
+
+    <script>
+      // AJAX Product Filter
+      document.addEventListener("DOMContentLoaded", () => {
+        const storeSlug = "{{store.slug}}";
+        const whatsappNumber = "{{store.whatsapp}}";
+        const grid = document.getElementById("productsGrid");
+        const searchInput = document.getElementById("searchInput");
+        let activeCategory = "";
+
+        const formatPrice = (price) =>
+          new Intl.NumberFormat("id-ID").format(price);
+
+        const stripAndTruncate = (html, max) => {
+          if (!html) return "";
+          const tmp = document.createElement("div");
+          tmp.innerHTML = html;
+          let text = tmp.textContent || tmp.innerText || "";
+          if (text.length > max) text = text.substring(0, max) + "...";
+          return text;
+        };
+
+        // Fetch Products Function
+        const fetchProducts = async (catId, searchTerm) => {
+          // Loading
+          grid.style.opacity = "0.5";
+          try {
+            let url = `/api/store/${storeSlug}/products?`;
+            const params = [];
+            if (catId) params.push(`category_id=${catId}`);
+            if (searchTerm)
+              params.push(`search=${encodeURIComponent(searchTerm)}`);
+
+            const res = await fetch(url + params.join("&"));
+
+            const json = await res.json();
+            const products = json.data || [];
+
+            // Update Count
+            const countEl = document.querySelector(".product-count");
+            if (countEl) countEl.textContent = `${products.length} produk`;
+
+            if (products.length === 0) {
+              grid.innerHTML = `
+                          <div class="empty-state">
+                            <span class="empty-icon">📦</span>
+                            <h3>Tidak ditemukan</h3>
+                            <p>Produk yang Anda cari tidak ada</p>
+                          </div>
+                         `;
+            } else {
+              grid.innerHTML = products
+                .map((p) => {
+                  const hasDiscount =
+                    p.discount_price &&
+                    p.discount_price > 0 &&
+                    p.discount_price < p.price;
+                  const displayPrice = hasDiscount
+                    ? formatPrice(p.discount_price)
+                    : formatPrice(p.price);
+                  const imageHtml = p.image_url
+                    ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy" />`
+                    : `<div class="product-placeholder"><span>📦</span></div>`;
+
+                  // Use slug if available, else ID.
+                  const productSlug = p.slug || p.id;
+                  const productLink = `/s/${storeSlug}/p/${productSlug}`;
+                  const shortDesc = stripAndTruncate(p.description, 120);
+
+                  return `
+                              <div class="product-card">
+                                <a href="${productLink}" style="text-decoration: none; color: inherit; display: contents">
+                                  <div class="product-image">${imageHtml}</div>
+                                  <div class="product-info">
+                                    <h3 class="product-name">${p.name}</h3>
+                                    <div class="product-desc">${shortDesc}</div>
+                                    <div class="product-footer">
+                                      ${
+                                        hasDiscount
+                                          ? `
+                                      <div>
+                                        <span class="product-price" style="font-size: 14px; text-decoration: line-through; color: #9ca3af; margin-right: 4px;">Rp ${formatPrice(p.price)}</span>
+                                        <span class="product-price">Rp ${displayPrice}</span>
+                                      </div>
+                                      `
+                                          : `
+                                      <span class="product-price">Rp ${displayPrice}</span>
+                                      `
+                                      }
+                                      <object>
+                                        <a href="https://wa.me/${whatsappNumber}?text=Halo, saya tertarik dengan ${p.name} (Rp ${displayPrice})"
+                                           class="btn-whatsapp btn-sm"
+                                           target="_blank"
+                                           onclick="event.stopPropagation()">
+                                          Pesan
+                                        </a>
+                                      </object>
+                                    </div>
+                                  </div>
+                                </a>
+                              </div>
+                            `;
+                })
+                .join("");
+            }
+          } catch (err) {
+            console.error("Filter Error:", err);
+          } finally {
+            grid.style.opacity = "1";
+          }
+        };
+
+        // Category Listeners
+        document.querySelectorAll(".cat-chip").forEach((chip) => {
+          chip.addEventListener("click", (e) => {
+            e.preventDefault();
+            // UI Toggle
+            document
+              .querySelectorAll(".cat-chip")
+              .forEach((c) => c.classList.remove("active"));
+            chip.classList.add("active");
+
+            activeCategory = chip.getAttribute("data-cat") || "";
+            fetchProducts(activeCategory, searchInput.value);
+          });
+        });
+
+        // Search Listener (Debounce)
+        let debounceTimer;
+        if (searchInput) {
+          searchInput.addEventListener("input", (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+              fetchProducts(activeCategory, e.target.value);
+            }, 500);
+          });
+        }
+      });
+
+      // Visual Editor Interaction
+      document.addEventListener("click", (e) => {
+        const target = e.target.closest("[data-bind]");
+        if (target) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Remove others
+          document
+            .querySelectorAll(".sello-selected")
+            .forEach((el) => el.classList.remove("sello-selected"));
+          target.classList.add("sello-selected");
+
+          const key = target.getAttribute("data-bind");
+          window.top.postMessage({ type: "sello-edit", key: key }, "*");
+        }
+      });
+      window.addEventListener("message", (e) => {
+        if (e.data.type === "sello-highlight") {
+          document
+            .querySelectorAll(".sello-selected")
+            .forEach((el) => el.classList.remove("sello-selected"));
+          const els = document.querySelectorAll(
+            '[data-bind="' + e.data.key + '"]',
+          );
+          els.forEach((el) => {
+            el.classList.add("sello-selected");
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

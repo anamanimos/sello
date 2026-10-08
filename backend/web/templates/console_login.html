@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Console - Sello</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/auth.css" />
+    <link rel="icon" href="/static/images/sello-icon.ico" />
+  </head>
+  <body class="auth-page">
+    <div
+      class="auth-container"
+      style="
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="auth-card"
+        style="
+          width: 100%;
+          max-width: 480px;
+          padding: 40px;
+          border-radius: 16px;
+          box-shadow: var(--shadow-xl);
+        "
+      >
+        <div class="auth-header">
+          <div class="logo">
+            <img
+              src="/static/images/sello-logo.webp"
+              alt="Sello Console"
+              height="80"
+            />
+          </div>
+          <p>Login Super Admin</p>
+        </div>
+
+        <div
+          id="errorMessage"
+          class="error-message"
+          style="
+            display: none;
+            color: var(--error);
+            background: #fee2e2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+          "
+        ></div>
+
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="admin@sello.id"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-input">
+              <input
+                type="password"
+                id="password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+            Masuk ke Console
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>&copy; 2024 Sello Platform.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "/console/api";
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const btn = document.getElementById("loginBtn");
+          const errorEl = document.getElementById("errorMessage");
+
+          btn.disabled = true;
+          btn.textContent = "Logging in...";
+          errorEl.classList.remove("show");
+
+          try {
+            const response = await fetch(`${API_BASE}/auth/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              localStorage.setItem("admin_token", data.token);
+              localStorage.setItem("admin_user", JSON.stringify(data.admin));
+              window.location.href = "/console/dashboard";
+            } else {
+              throw new Error(data.error || "Login failed");
+            }
+          } catch (error) {
+            errorEl.textContent = error.message;
+            errorEl.classList.add("show");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Login";
+          }
+        });
+
+      // Check if already logged in
+      if (localStorage.getItem("admin_token")) {
+        window.location.href = "/console/dashboard";
+      }
+    </script>
+  </body>
+</html>
