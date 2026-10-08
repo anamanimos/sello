@@ -326,8 +326,11 @@ func main() {
 	r.Static("/themes", "./web/themes")
 	r.Static("/uploads", "./web/uploads")
 	
-	// Landing page for local development (accessible at /landing/)
+	// Landing page for local development and root assets
 	r.Static("/landing", "./landing")
+	r.StaticFile("/styles.css", "./landing/styles.css")
+	r.StaticFile("/script.js", "./landing/script.js")
+	r.Static("/assets", "./landing/assets")
 
 	// CORS middleware
 	r.Use(func(c *gin.Context) {
@@ -511,7 +514,11 @@ func main() {
 				handlers.RenderStoreFromDomain(c)
 				return
 			}
-			// For main domain, redirect to login
+			if accessType == "main" {
+				c.File("./landing/index.html")
+				return
+			}
+			// For app subdomain or fallback, redirect to login
 			c.Redirect(http.StatusFound, "/login")
 		})
 		
